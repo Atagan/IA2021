@@ -42,7 +42,7 @@
 
 
 (define (generarSala mapa bloqueos puertas coordenadas)
-  (cond [(member coordenadas bloqueos) (generarSala(sustituir mapa (list-ref coordenadas 0) (list-ref coordenadas 1) "#") bloqueos puertas (obtenerNuevaCoordenada coordenadas mapa)))]
+  (cond [(member coordenadas bloqueos) (generarSala(sustituir mapa (list-ref coordenadas 0) (list-ref coordenadas 1) "#") bloqueos puertas (obtenerNuevaCoordenada coordenadas mapa))]
                  [(member coordenadas puertas) (generarSala(sustituir mapa (list-ref coordenadas 0) (list-ref coordenadas 1) ":") bloqueos puertas (obtenerNuevaCoordenada coordenadas mapa))]
                  [(equal? coordenadas (get-initial-state)) (generarSala(sustituir mapa (list-ref coordenadas 0) (list-ref coordenadas 1) "x") bloqueos puertas (obtenerNuevaCoordenada coordenadas mapa))]
                  [(equal? coordenadas (get-end-state (length (car mapa)) (length mapa))) (generarSala(sustituir mapa (list-ref coordenadas 0) (list-ref coordenadas 1) "X") bloqueos puertas (obtenerNuevaCoordenada coordenadas mapa))]
