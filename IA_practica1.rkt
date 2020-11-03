@@ -41,9 +41,23 @@
    ))
 
 
-(define (generarSala mapa bloqueos puertas )
-  
-  1
+(define (generarSala mapa bloqueos puertas coordenadas)
+  (cond [(member coordenadas bloqueos) (generarSala(sustituir mapa (list-ref coordenadas 0) (list-ref coordenadas 1) "#") bloqueos puertas (obtenerNuevaCoordenada coordenadas mapa)))]
+                 [(member coordenadas puertas) (generarSala(sustituir mapa (list-ref coordenadas 0) (list-ref coordenadas 1) ":") bloqueos puertas (obtenerNuevaCoordenada coordenadas mapa))]
+                 [(equal? coordenadas (get-initial-state)) (generarSala(sustituir mapa (list-ref coordenadas 0) (list-ref coordenadas 1) "x") bloqueos puertas (obtenerNuevaCoordenada coordenadas mapa))]
+                 [(equal? coordenadas (get-end-state (length (car mapa)) (length mapa))) (generarSala(sustituir mapa (list-ref coordenadas 0) (list-ref coordenadas 1) "X") bloqueos puertas (obtenerNuevaCoordenada coordenadas mapa))]
+                 ;meter la condición de que haya acabado
+                 [else (sustituir mapa (list-ref coordenadas 0) (list-ref coordenadas 1) "_") ])
+  )
+
+(define (obtenerNuevaCoordenada coordenadas mapa) ;lo que el nombre indica, retorna una tupla que es la siguiente coordenada recorriendo el mapa de arriba a abajo de izquierda a derecha
+  (cond [(< (list-ref coordenadas 1) (length (car mapa))) (cons (+ 1 (list-ref coordenadas 0)) (list-ref coordenadas 1) )]
+        [else (cons (list-ref coordenadas 0) (+ 1 (list-ref coordenadas 1)))]
+   )
+ )
+
+(define (sustituir mapa fila col valor)
+  (list-set mapa fila (list-set (list-ref mapa fila) col valor))
   )
 
 (define (generate-room rows columns blocks doors) ;genera la sala, incluyendo el número de obstaculos y puertas??, seleccionados
@@ -57,10 +71,7 @@
                   [sublist '()]
                   #:result superlist);qué puto cojones
                  ([i rows][j columns])
-             (printf "~a" superlist)
-             (printf "\n")
-             (printf "~a" sublist)
-             (printf "\n")
+
          (define character
            (cond [(member (cons i j) block-positions) "#"]
                  [(member (cons i j) door-positions) ":"]
