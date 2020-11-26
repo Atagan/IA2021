@@ -40,25 +40,39 @@
    (check-not-false (or (member 3 remaining) (member 3 picked)))
    ))
 
+;(imprimirMapa(generarMapa 10 5 10 5))
+(define (generarMapa filas columnas bloqueos puertas)
+  (define-values (free-positions block-positions) (pick-random (generate-positions filas columnas) bloqueos))
+  (define-values (final-free-positions door-positions) (pick-random free-positions puertas))
 
-(define (generarSala mapa bloqueos puertas coordenadas)
-  (cond [(member coordenadas bloqueos) (generarSala(sustituir mapa (list-ref coordenadas 0) (list-ref coordenadas 1) "#") bloqueos puertas (obtenerNuevaCoordenada coordenadas mapa))]
-                 [(member coordenadas puertas) (generarSala(sustituir mapa (list-ref coordenadas 0) (list-ref coordenadas 1) ":") bloqueos puertas (obtenerNuevaCoordenada coordenadas mapa))]
-                 [(equal? coordenadas (get-initial-state)) (generarSala(sustituir mapa (list-ref coordenadas 0) (list-ref coordenadas 1) "x") bloqueos puertas (obtenerNuevaCoordenada coordenadas mapa))]
-                 [(equal? coordenadas (get-end-state (length (car mapa)) (length mapa))) (generarSala(sustituir mapa (list-ref coordenadas 0) (list-ref coordenadas 1) "X") bloqueos puertas (obtenerNuevaCoordenada coordenadas mapa))]
+  (define mapa (make-list filas (make-list columnas "_")))
+
+  
+  (generarSala mapa block-positions door-positions (cons 0 0))
+  )
+
+(define (generarSala mapa bloqueos puertas coordenadas)  
+  ;(imprimirMapa mapa)
+  (if (equal? (car coordenadas) (length mapa)) mapa
+      (cond [(member coordenadas bloqueos) (generarSala(sustituir mapa (car coordenadas ) (cdr coordenadas) "#") bloqueos puertas (obtenerNuevaCoordenada coordenadas mapa))]
+                 [(member coordenadas puertas) (generarSala(sustituir mapa (car coordenadas) (cdr coordenadas) ":") bloqueos puertas (obtenerNuevaCoordenada coordenadas mapa))]
+                 [(equal? coordenadas (get-initial-state)) (generarSala(sustituir mapa (car coordenadas ) (cdr coordenadas) "x") bloqueos puertas (obtenerNuevaCoordenada coordenadas mapa))]
+                 [(equal? coordenadas (get-end-state (length (car mapa)) (length mapa))) (generarSala(sustituir mapa (car coordenadas) (cdr coordenadas) "X") bloqueos puertas (obtenerNuevaCoordenada coordenadas mapa))]
                  ;meter la condición de que haya acabado
-                 [else (sustituir mapa (list-ref coordenadas 0) (list-ref coordenadas 1) "_") ])
+                 [else (generarSala mapa bloqueos puertas (obtenerNuevaCoordenada coordenadas mapa)) ])
+  )
   )
 
 (define (obtenerNuevaCoordenada coordenadas mapa) ;lo que el nombre indica, retorna una tupla que es la siguiente coordenada recorriendo el mapa de arriba a abajo de izquierda a derecha
-  (cond [(< (list-ref coordenadas 1) (length (car mapa))) (cons (+ 1 (list-ref coordenadas 0)) (list-ref coordenadas 1) )]
-        [else (cons (list-ref coordenadas 0) (+ 1 (list-ref coordenadas 1)))]
-   )
+  (cond[(> (cdr coordenadas) (- (length (car mapa)) 1 )) (cons (+ 1 (car coordenadas)) 0)]
+   [else (cons (car coordenadas) (+ 1 (cdr coordenadas)))])
  )
 
 (define (sustituir mapa fila col valor)
   (list-set mapa fila (list-set (list-ref mapa fila) col valor))
   )
+
+
 
 (define (generate-room rows columns blocks doors) ;genera la sala, incluyendo el número de obstaculos y puertas??, seleccionados
   ;estas dos lineas tendrán que ir fuera del bloque recursivo y sus valores ser pasados como parametro
@@ -83,6 +97,8 @@
              (values superlist (cons character sublist))))))
 
 (define (imprimirMapa mapa)
+  (printf "------------------")
+  (printf "~a" "\n")
   (for* ([i (length mapa)]
          [j (length (car mapa))])
     
@@ -90,4 +106,7 @@
     (printf "~a" (list-ref (list-ref mapa i)j))
     (when (= j (- (length (car mapa)) 1))(printf "~a" "\n"))
     )
+  (printf "------------------")
+  (printf "~a" "\n")
   )
+
