@@ -110,3 +110,36 @@
   (printf "~a" "\n")
   )
 
+
+;Función que comprueba si es una casilla vacía
+(define(checkPosicionVacia mapa fila columna)
+  (if (string=? (list-ref(list-ref mapa fila) columna) "_") #t #f))
+
+;Función que comprueba si hay una puerta
+(define(checkPuerta mapa fila columna)
+  (if (string=? (list-ref(list-ref mapa fila) columna) ":") #t #f))
+
+;Función que comprueba si hay una pared
+(define(checkPared mapa fila columna)
+  (if (string=? (list-ref(list-ref mapa fila) columna) "#") #t #f))
+
+;Función que comprueba si es meta
+(define(checkMeta mapa fila columna)
+  (if (string=? (list-ref(list-ref mapa fila) columna) "X") #t #f))
+
+
+
+;Funcion auxiliar para ABIERTOS
+(define (comprobarAbiertos coordenadas)
+  (list (cons (car coordenadas) (- (cdr coordenadas) 1)) (cons (- (car coordenadas) 1) (cdr coordenadas)) (cons (car coordenadas) (+ (cdr coordenadas) 1)) (cons (+ (car coordenadas) 1) (cdr coordenadas)))
+)
+
+
+(define (busqAnchura coordenadas mapa abiertos cerrados)
+  (if (> (list-ref (length (car mapa)) (car coordenadas))) #f
+      ((list cerrados coordenadas);añadimos la posición actual a cerrados
+      (list abiertos (comprobarAbiertos coordenadas));generamos todos los abiertos de la posición actual y los añadimos por el final a los anteriores
+      )
+      ;usar un for/or 
+      )
+  )
