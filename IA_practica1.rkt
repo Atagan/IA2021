@@ -72,6 +72,14 @@
   )
   )
 
+(define (generarCamino mapa cerrados coordenadas)  
+  ;(imprimirMapa mapa)
+  (if (equal? (car coordenadas) (length mapa)) mapa
+      (cond [(member coordenadas cerrados) (generarCamino(sustituir mapa (car coordenadas ) (cdr coordenadas) "o") cerrados (obtenerNuevaCoordenada coordenadas mapa))]
+            [else (generarCamino mapa cerrados (obtenerNuevaCoordenada coordenadas mapa)) ])
+  )
+  )
+
 (define (obtenerNuevaCoordenada coordenadas mapa) ;lo que el nombre indica, retorna una tupla que es la siguiente coordenada recorriendo el mapa de arriba a abajo de izquierda a derecha
   (cond[(> (cdr coordenadas) (- (length (car mapa)) 1 )) (cons (+ 1 (car coordenadas)) 0)]
    [else (cons (car coordenadas) (+ 1 (cdr coordenadas)))])
@@ -148,27 +156,59 @@
   (remove-duplicates(remove coordenadas (append abiertos (comprobarAbiertos coordenadas))))
  )
 
+
+;función que elimina valores repetidos en dos listas (eliminarDobles? '((0 1) (1 0) (1 2) (2 1)) '((0 1)) '())
+(define (eliminarDobles? lista1 lista2 lista3)
+   (if (null? lista1) lista3
+        (if (member (car lista1) lista2) (eliminarDobles? (rest lista1) lista2 lista3)
+            (eliminarDobles? (rest lista1) lista2 (cons (car lista1) lista3))
+            )
+        )
+  )
+  
+;(arreglarAbiertos (list (cons 0 1) ( cons 1 0) (cons 1 2) ( cons 2 1) ( cons -1 -1)) (list (cons 0 1)) (generarMapa 10 5 10 5))
 ;funcion auxliar que elimine nodos de abiertos si ya están en cerrados
-(define (arreglarAbiertos abiertos cerrados mapa)
-  (for ([i (length cerrados)])
-       (set! abiertos (remove (list-ref cerrados i) abiertos))
-    )
+(define (arreglarAbiertosCoste abiertos cerrados mapa)
+  (set! abiertos (eliminarDobles? abiertos cerrados '()))
   (define abiertos2 abiertos)
-  (for ([i (- (length abiertos) 1)])
+  (for ([i (length abiertos)])
     (if(coordenadaValida mapa (list-ref abiertos i))#t
        (set! abiertos2 (remove (list-ref abiertos i) abiertos2))
      )
    )
-  abiertos2
+
+  (define puertas '())
+  (define vacios '())
+  (for ([i (length abiertos2)]);esto lo que hace es crear una lista de nodos hijo ordenada ascencientemente por coste.
+    (if(checkPuerta mapa (car(list-ref abiertos2 i))(cdr(list-ref abiertos2 i)))
+       (set! puertas (append puertas (list (list-ref abiertos2 i))))
+       (set! vacios (append vacios (list (list-ref abiertos2 i))))
+       )
+    )
+
+  (append vacios puertas)
+ )
+
+(define (arreglarAbiertosNoCoste abiertos cerrados mapa)
+  (set! abiertos (eliminarDobles? abiertos cerrados '()))
+  (define abiertos2 abiertos)
+  (for ([i (length abiertos)])
+    (if(coordenadaValida mapa (list-ref abiertos i))#t
+       (set! abiertos2 (remove (list-ref abiertos i) abiertos2))
+     )
+   )
+ abiertos2
  )
 
 ;comprobar que unas coordenadas estén dentro del tablero
 (define (coordenadaValida mapa coordenada) 
-  (if(>(car coordenada) (length (car mapa)))#f
-     (if (>(cdr coordenada) (length mapa))#f
+  (if(>(cdr coordenada) (- (length (car mapa)) 1))#f
+     (if (>(car coordenada) (- (length mapa) 1))#f
          (if(> 0 (car coordenada))#f
             (if(> 0 (cdr coordenada))#f
-               #t
+               (if(checkPared mapa (car coordenada) (cdr coordenada))#f
+                  #t
+                  )
                )
             )
          )
@@ -176,16 +216,37 @@
   )
 
 
-  
+
+(define (busqCosteUniforme coordenadas mapa abiertos cerrados)
+   (if  (member (get-end-state (length  mapa) (length (car mapa))) cerrados) cerrados
+      (if (eq? '() (arreglarAbiertosCoste (nuevosAbiertos abiertos coordenadas) cerrados mapa))#f
+          (busqCosteUniforme (list-ref (arreglarAbiertosCoste (nuevosAbiertos abiertos coordenadas) cerrados mapa) 0) mapa (arreglarAbiertosCoste (nuevosAbiertos abiertos coordenadas) cerrados mapa) (append cerrados (list(list-ref (arreglarAbiertosCoste (nuevosAbiertos abiertos coordenadas) cerrados mapa) 0))))
+          )
+      )
+  )
+
 
 (define (busqAnchura coordenadas mapa abiertos cerrados)
-  (if (equal? coordenadas (get-end-state (length  mapa) (length (car mapa))))#t
-      (if (eq? '() (arreglarAbiertos (nuevosAbiertos abiertos coordenadas) cerrados mapa))#f
-          (busqAnchura (list-ref (nuevosAbiertos abiertos coordenadas) 0) mapa (arreglarAbiertos (nuevosAbiertos abiertos coordenadas) cerrados mapa) (list (car cerrados) (list-ref (nuevosAbiertos abiertos coordenadas) 0)))
+  ;(printf "entro en recursividad")
+  ;(printf "~a" cerrados)
+  ;(printf "~a" "\n")
+  (if  (member (get-end-state (length  mapa) (length (car mapa))) cerrados) cerrados
+      (if (eq? '() (arreglarAbiertosNoCoste (nuevosAbiertos abiertos coordenadas) cerrados mapa))#f
+          (busqAnchura (list-ref (arreglarAbiertosNoCoste (nuevosAbiertos abiertos coordenadas) cerrados mapa) 0) mapa (arreglarAbiertosNoCoste (nuevosAbiertos abiertos coordenadas) cerrados mapa) (append cerrados (list(list-ref (arreglarAbiertosNoCoste (nuevosAbiertos abiertos coordenadas) cerrados mapa) 0))))
           )
       )
   )
 
 (define (comenzarBusqueda)
-  (busqAnchura (get-initial-state) (generarMapa 10 5 10 5) '() '((1 1)))
+  (define mapa '(()))
+  (set! mapa (generarMapa 7 5 7 5))
+  (printf "Mapa Original")
+  (printf "~a" "\n")
+  (imprimirMapa mapa)
+  (printf "Busqueda en Anchura Desinformada sin Costes")
+  (printf "~a" "\n")
+  (imprimirMapa(generarCamino mapa (busqAnchura (get-initial-state) mapa (arreglarAbiertosNoCoste (nuevosAbiertos '() (cons 1 1)) '() mapa) (list (get-initial-state))) (get-initial-state)))
+  (printf "Algoritmo A* con función heuristica Costante")
+  (printf "~a" "\n")
+  (imprimirMapa(generarCamino mapa (busqCosteUniforme (get-initial-state) mapa (arreglarAbiertosNoCoste (nuevosAbiertos '() (cons 1 1)) '() mapa) (list (get-initial-state))) (get-initial-state)))
  )
