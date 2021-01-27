@@ -173,7 +173,7 @@
   (define abiertos2 abiertos)
   (for ([i (length abiertos)])
     (if(coordenadaValida mapa (list-ref abiertos i))#t
-       (set! abiertos2 (remove (list-ref abiertos i) abiertos2))
+       (set! abiertos2 (remove (list-ref abiertos i) abiertos2));abiertos2.remove(abiertos.get(i))
      )
    )
 
