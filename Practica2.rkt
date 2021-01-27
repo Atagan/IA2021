@@ -47,7 +47,7 @@
 
 ; Funcion que obtiene las canicas en una casilla
 (define (get-balls casilla)
-  (list-ref casilla board))
+  (list-ref board casilla))
 
 ; Funcion que inserta las canicas de la forma (canica canica canica ...) en las casillas aledañas
 (define (insert-ball lista casilla)
@@ -69,17 +69,17 @@
 (define (valid-operator? operador estado)
   (let ((operador (second operador)))
     (cond ((= operador 7)
-           (if (null (list-ref 7 estado)) null true))
+           (if (null (list-ref estado 7)) null true))
           ((= operador 8)
-           (if (null (list-ref 8 estado)) null true))
+           (if (null (list-ref estado 8)) null true))
           ((= operador 9)
-           (if (null (list-ref 9 estado)) null true))
+           (if (null (list-ref estado 9)) null true))
           ((= operador 10)
-           (if (null (list-ref 10 estado)) null true))
+           (if (null (list-ref estado 10)) null true))
           ((= operador 11)
-           (if (null (list-ref 11 estado)) null true))
+           (if (null (list-ref estado 11)) null true))
           ((= operador 12)
-           (if (null (list-ref 12 estado)) null true))
+           (if (null (list-ref estado 12)) null true))
           (true null))))
 
 ; Funcion que aplica un operador de *ops* a un estado determinado
