@@ -113,3 +113,33 @@
   (for ([elemento tablero])
     (set! estado-copia (cons elemento estado-copia)))
   (set! estado-copia  (reverse estado-copia))))
+  
+;move-machine-balls
+
+;heuristic-function
+
+; Funcion la cual cambia de jugador, si es 0 --> 1 (le toca a la IA1) y si es 1 --> 0 (le toca al IA2)
+(define (change-player jugador)
+  (case jugador
+    [(0) 1]
+    [(1) 0]))
+    
+;Funcion auxiliar para expand
+(define (full-copy list)
+(if (null? list) 
+  '() 
+  (if (list? list) 
+      (cons (full-copy (car list)) (full-copy (cdr list)))
+      list)))
+     
+;Funcion que aplica todos los operadores de *ops* a un estado determinado y los regresa en una lista
+(define (expand estado)
+  (let* ((sucesores null)
+         (nuevo-estado null)
+         (estado-copia (full-copy estado)))
+    (for ([operador ops]) 
+         (if (valid-operator? operador estado-copia)
+             (begin
+               (set! nuevo-estado (apply-operator operador estado-copia))
+               (cons nuevo-estado sucesores)))
+       (return sucesores))))   
