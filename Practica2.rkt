@@ -18,11 +18,11 @@
 (define IA2-points 0)
 
 ; Función que imprime el tablero del mancala, en cada casilla imprime el valor de la suma de las canicas que se encuentran en esa casilla
-;(define (print-board)
-;  (format  t   "~&~% | ~A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A | ~%"
-;           (apply #'+ (list-ref 13 *board*))(apply #'+ (list-ref 12 *board*)) (apply #'+ (list-ref 11 *board*)) (apply #'+ (list-ref 10 *board*)) (apply #'+ (list-ref 9 *board*)) (apply #'+ (list-ref 8 *board*)) (apply #'+ (list-ref 7 *board*)))
-;  (format  t   "~& | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A | ~%~%"
-;           (apply #'+ (list-ref 0 *board*)) (apply #'+ (list-ref 1 *board*)) (apply #'+ (list-ref 2 *board*)) (apply #'+ (list-ref 3 *board*)) (apply #'+ (list-ref 4 *board*)) (apply #'+ (list-ref 5 *board*)) (apply #'+ (list-ref 6 *board*))))
+(define (print-board)
+  (printf   "~&~% | ~A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A | ~%"
+           (apply #'+ (list-ref 13 board))(apply #'+ (list-ref 12 board)) (apply #'+ (list-ref 11 board)) (apply #'+ (list-ref 10 board)) (apply #'+ (list-ref 9 board)) (apply #'+ (list-ref 8 board)) (apply #'+ (list-ref 7 board)))
+  (printf   "~& | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A | ~%~%"
+           (apply #'+ (list-ref 0 board)) (apply #'+ (list-ref 1 board)) (apply #'+ (list-ref 2 board)) (apply #'+ (list-ref 3 board)) (apply #'+ (list-ref 4 board)) (apply #'+ (list-ref 5 board)) (apply #'+ (list-ref 6 board))))
 
 ; Funcion que reinicia el tablero a su estado original
 (define (reset-game)
