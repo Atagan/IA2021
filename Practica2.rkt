@@ -63,16 +63,7 @@
  )
 
 ; Funcion que mueve las canicas de la casilla seleccionada
-(define (move-ball casilla-actual)
-  (let ((canicas (get-balls casilla-actual))
-        (movimiento null))
-  (printf "~& Canicas en casilla:  ~a ~%" canicas)
-  (printf "~& Indique la casilla a la cual ira cada canica de la forma (canica canica canica ...)~%")
-  (set! movimiento(read))
-  (insert-ball movimiento casilla-actual)
-    (for canica in canicas do
-         (list-tail (list-ref casilla-actual board) 1))
-    (print-board)))
+
 
 ; Predicado que valida si es el operador seleccionado es valido
 (define (valid-operator? operador estado)
@@ -114,8 +105,16 @@
     (set! estado-copia (cons elemento estado-copia)))
   (set! estado-copia  (reverse estado-copia))))
   
-;move-machine-balls
+;función que mueve las canicas de la IA
+(define (move-machine-balls tablero casilla-actual canicas-casilla)
+  (define-values (canica-a-meter cont estado canicas longitud-canicas estado-copia best-canca shoot-again casilla-target)
+    (values null 0 null null 0 null 0 null (+ 1 casilla-actual)))
+  (set! estado-copia (copy-board tablero))
 
+  (for ([can canicas-casilla])
+    (set! canicas (cons can canicas))
+   )
+ )
 ;heuristic-function
 
 ; Funcion la cual cambia de jugador, si es 0 --> 1 (le toca a la IA1) y si es 1 --> 0 (le toca al IA2)
@@ -138,8 +137,14 @@
          (nuevo-estado null)
          (estado-copia (full-copy estado)))
     (for ([operador ops]) 
-         (if (valid-operator? operador estado-copia)
+         (when (valid-operator? operador estado-copia)
              (begin
                (set! nuevo-estado (apply-operator operador estado-copia))
-               (cons nuevo-estado sucesores)))
-       (return sucesores))))   
+               (cons nuevo-estado sucesores))
+             )
+        sucesores
+      )
+    )
+  )
+
+;miniMax
