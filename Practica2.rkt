@@ -39,19 +39,19 @@
 ; Predicado el cual valida si el juego ya terminó comprobando si alguna hilera esta completamente vacía
 (define (game-ended?)
   (game-ended? (or (and
-                     (null (list-ref board 0))
-                     (null (list-ref board 1))
-                     (null (list-ref board 2))
-                     (null (list-ref board 3))
-                     (null (list-ref board 4))
-                     (null (list-ref board 5)))
+                     (equal? null (list-ref board 0))
+                     (equal? null (list-ref board 1))
+                     (equal? null (list-ref board 2))
+                     (equal? null (list-ref board 3))
+                     (equal? null (list-ref board 4))
+                     (equal? null (list-ref board 5)))
                    (and
-                    (null (list-ref board 7))
-                    (null (list-ref board 8))
-                    (null (list-ref board 9))
-                    (null (list-ref board 10))
-                    (null (list-ref board 11))
-                    (null (list-ref board 12))))))
+                    (equal? null (list-ref board 7))
+                    (equal? null (list-ref board 8))
+                    (equal? null (list-ref board 9))
+                    (equal? null (list-ref board 10))
+                    (equal? null (list-ref board 11))
+                    (equal? null (list-ref board 12))))))
 
 ; Funcion que obtiene las canicas en una casilla
 (define (get-balls casilla)
