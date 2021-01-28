@@ -18,11 +18,11 @@
 (define IA2-points 0)
 
 ; Función que imprime el tablero del mancala, en cada casilla imprime el valor de la suma de las canicas que se encuentran en esa casilla
-(define (print-board)
-  (printf   "~&~% | ~A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A | ~%"
-           (apply #'+ (list-ref 13 board))(apply #'+ (list-ref 12 board)) (apply #'+ (list-ref 11 board)) (apply #'+ (list-ref 10 board)) (apply #'+ (list-ref 9 board)) (apply #'+ (list-ref 8 board)) (apply #'+ (list-ref 7 board)))
-  (printf   "~& | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A | ~%~%"
-           (apply #'+ (list-ref 0 board)) (apply #'+ (list-ref 1 board)) (apply #'+ (list-ref 2 board)) (apply #'+ (list-ref 3 board)) (apply #'+ (list-ref 4 board)) (apply #'+ (list-ref 5 board)) (apply #'+ (list-ref 6 board))))
+;(define (print-board)
+;  (format  t   "~&~% | ~A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A | ~%"
+;           (apply #'+ (list-ref 13 *board*))(apply #'+ (list-ref 12 *board*)) (apply #'+ (list-ref 11 *board*)) (apply #'+ (list-ref 10 *board*)) (apply #'+ (list-ref 9 *board*)) (apply #'+ (list-ref 8 *board*)) (apply #'+ (list-ref 7 *board*)))
+;  (format  t   "~& | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A | ~%~%"
+;           (apply #'+ (list-ref 0 *board*)) (apply #'+ (list-ref 1 *board*)) (apply #'+ (list-ref 2 *board*)) (apply #'+ (list-ref 3 *board*)) (apply #'+ (list-ref 4 *board*)) (apply #'+ (list-ref 5 *board*)) (apply #'+ (list-ref 6 *board*))))
 
 ; Funcion que reinicia el tablero a su estado original
 (define (reset-game)
@@ -69,17 +69,17 @@
 (define (valid-operator? operador estado)
   (let ((operador (second operador)))
     (cond ((= operador 7)
-           (if (null (list-ref 7 estado)) null true))
+           (if (null (list-ref estado 7)) null true))
           ((= operador 8)
-           (if (null (list-ref 8 estado)) null true))
+           (if (null (list-ref estado 8)) null true))
           ((= operador 9)
-           (if (null (list-ref 9 estado)) null true))
+           (if (null (list-ref estado 9)) null true))
           ((= operador 10)
-           (if (null (list-ref 10 estado)) null true))
+           (if (null (list-ref estado 10)) null true))
           ((= operador 11)
-           (if (null (list-ref 11 estado)) null true))
+           (if (null (list-ref estado 11)) null true))
           ((= operador 12)
-           (if (null (list-ref 12 estado)) null true))
+           (if (null (list-ref estado 12)) null true))
           (true null))))
 
 ; Funcion que aplica un operador de *ops* a un estado determinado
@@ -114,6 +114,36 @@
   (for ([can canicas-casilla])
     (set! canicas (cons can canicas))
    )
+  (set! canicas (sort canicas >))
+  (set! longitud-canicas (length canicas))
+  
+  (when (>= (length canicas) (- 13 casilla-actual))
+    (begin
+      (set! best-canca (car canicas))
+      (set! best-canca (list-set best-canca 13 (append estado-copia (list-ref best-canca 13))))
+      )
+    )
+  ;Si la longitud de tus canicas es igual a la canica en la que te encuentras, la IA vuelve a tirar
+  (when (= 0 (- (length canicas) (- 13 casilla-actual)))
+      (set! shoot-again #t)
+      (set! shoot-again null))
+
+  (for ([canica canicas])
+    (set! canica-a-meter (car (list-ref  estado-copia casilla-actual)))
+
+    (if (and (= cont 0 ) ( = best-canca canica-a-meter))
+        (begin
+         (set! cont (+ 1 cont)))
+        (begin
+          (when (> casilla-target 12)
+           (set! casilla-target 0))
+         
+         (set! canica-a-meter (list-set canica-a-meter casilla-target (append estado-copia (list-ref canica-a-meter casilla-target))))
+         (set! casilla-target (+ 1 casilla-target))
+         )
+        )
+   )
+  (list estado-copia shoot-again casilla-actual)
  )
 ;heuristic-function
 
