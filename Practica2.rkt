@@ -18,11 +18,19 @@
 (define IA2-points 0)
 
 ; Función que imprime el tablero del mancala, en cada casilla imprime el valor de la suma de las canicas que se encuentran en esa casilla
+<<<<<<< HEAD
 ;(define (print-board)
 ;  (format  t   "~&~% | ~A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A | ~%"
 ;           (apply #'+ (list-ref 13 *board*))(apply #'+ (list-ref 12 *board*)) (apply #'+ (list-ref 11 *board*)) (apply #'+ (list-ref 10 *board*)) (apply #'+ (list-ref 9 *board*)) (apply #'+ (list-ref 8 *board*)) (apply #'+ (list-ref 7 *board*)))
 ;  (format  t   "~& | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A | ~%~%"
 ;           (apply #'+ (list-ref 0 *board*)) (apply #'+ (list-ref 1 *board*)) (apply #'+ (list-ref 2 *board*)) (apply #'+ (list-ref 3 *board*)) (apply #'+ (list-ref 4 *board*)) (apply #'+ (list-ref 5 *board*)) (apply #'+ (list-ref 6 *board*))))
+=======
+(define (print-board)
+  (printf   "~&~% | ~A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A | ~%"
+           (apply #'+ (list-ref board 13))(apply #'+ (list-ref board 12)) (apply #'+ (list-ref board 11)) (apply #'+ (list-ref board 10)) (apply #'+ (list-ref board 9 )) (apply #'+ (list-ref board 8)) (apply #'+ (list-ref board 7)))
+  (printf   "~& | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A |  | ~:A | ~%~%"
+           (apply #'+ (list-ref board 0)) (apply #'+ (list-ref board 1)) (apply #'+ (list-ref board 2)) (apply #'+ (list-ref board 3)) (apply #'+ (list-ref board 4)) (apply #'+ (list-ref board 5)) (apply #'+ (list-ref board 6))))
+>>>>>>> 4d6b2cb1242d31f5a6d47b698fa040c6b40deb17
 
 ; Funcion que reinicia el tablero a su estado original
 (define (reset-game)
@@ -31,23 +39,23 @@
 ; Predicado el cual valida si el juego ya terminó comprobando si alguna hilera esta completamente vacía
 (define (game-ended?)
   (game-ended? (or (and
-                     (null (list-ref 0 board))
-                     (null (list-ref 1 board))
-                     (null (list-ref 2 board))
-                     (null (list-ref 3 board))
-                     (null (list-ref 4 board))
-                     (null (list-ref 5 board)))
+                     (null (list-ref board 0))
+                     (null (list-ref board 1))
+                     (null (list-ref board 2))
+                     (null (list-ref board 3))
+                     (null (list-ref board 4))
+                     (null (list-ref board 5)))
                    (and
-                    (null (list-ref 7 board))
-                    (null (list-ref 8 board))
-                    (null (list-ref 9 board))
-                    (null (list-ref 10 board))
-                    (null (list-ref 11 board))
-                    (null (list-ref 12 board))))))
+                    (null (list-ref board 7))
+                    (null (list-ref board 8))
+                    (null (list-ref board 9))
+                    (null (list-ref board 10))
+                    (null (list-ref board 11))
+                    (null (list-ref board 12))))))
 
 ; Funcion que obtiene las canicas en una casilla
 (define (get-balls casilla)
-  (list-ref casilla board))
+  (list-ref board casilla))
 
 ; Funcion que inserta las canicas de la forma (canica canica canica ...) en las casillas aledañas
 (define (insert-ball lista casilla)
