@@ -30,37 +30,24 @@
 
 ;Predicado el cual valida si el juego ya terminó comprobando si alguna hilera esta completamente vacía
 (define (game-ended?)
-<<<<<<< HEAD
   (or (and
-                    (equal? null (list-ref board 0))
-                    (equal? null (list-ref board 1))
-                    (equal? null (list-ref board 2))
-                    (equal? null (list-ref board 3))
-                    (equal? null (list-ref board 4))
-                    (equal? null (list-ref board 5)))
-=======
-  (game-ended? (or (and
-                     (equal? null (list-ref board 0))
-                     (equal? null (list-ref board 1))
-                     (equal? null (list-ref board 2))
-                     (equal? null (list-ref board 3))
-                     (equal? null (list-ref board 4))
-                     (equal? null (list-ref board 5)))
->>>>>>> bb53e5fd56fbb1c2fbcd130d88f566ed9a24a6dd
-                   (and
-                    (equal? null (list-ref board 7))
-                    (equal? null (list-ref board 8))
-                    (equal? null (list-ref board 9))
-                    (equal? null (list-ref board 10))
-                    (equal? null (list-ref board 11))
-<<<<<<< HEAD
-                    (equal? null (list-ref board 12))
-                   )
-               )
+       (equal? null (list-ref board 0))
+       (equal? null (list-ref board 1))
+       (equal? null (list-ref board 2))
+       (equal? null (list-ref board 3))
+       (equal? null (list-ref board 4))
+       (equal? null (list-ref board 5)))
+      
+      (and
+       (equal? null (list-ref board 7))
+       (equal? null (list-ref board 8))
+       (equal? null (list-ref board 9))
+       (equal? null (list-ref board 10))
+       (equal? null (list-ref board 11))
+       (equal? null (list-ref board 12))
+       )
+      )
   )
-=======
-                    (equal? null (list-ref board 12))))))
->>>>>>> bb53e5fd56fbb1c2fbcd130d88f566ed9a24a6dd
 
 ; Funcion que obtiene las canicas en una casilla
 (define (get-balls casilla)
@@ -81,7 +68,6 @@
 
 ; Predicado que valida si es el operador seleccionado es valido
 (define (valid-operator? operador estado)
-<<<<<<< HEAD
   (let ((operador (car(cdr operador))))
     (cond ((= operador 7) (if (equal? null (list-ref estado 7))
                               #f
@@ -106,22 +92,7 @@
           )
     )
   )
-=======
-  (let ((operador (second operador)))
-    (cond ((= operador 7)
-           (if (equal? null (list-ref estado 7)) null true))
-          ((= operador 8)
-           (if (equal? null (list-ref estado 8)) null true))
-          ((= operador 9)
-           (if (equal? null (list-ref estado 9)) null true))
-          ((= operador 10)
-           (if (equal? null (list-ref estado 10)) null true))
-          ((= operador 11)
-           (if (equal? null (list-ref estado 11)) null true))
-          ((= operador 12)
-           (if (equal? null (list-ref estado 12)) null true))
-          (true null))))
->>>>>>> bb53e5fd56fbb1c2fbcd130d88f566ed9a24a6dd
+
 
 ; Funcion que aplica un operador de *ops* a un estado determinado
 (define (apply-operator operador estado)
