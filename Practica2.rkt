@@ -277,9 +277,10 @@
 
 ;play randomvsrandom
 (define (play-random debug)
-  (if (equal? game-ended? #f)
+  (if (equal? (game-ended?) #f)
       ((juega-random debug)
-       (play-random debug))
+       (change-player)
+       (play-random #t))
       (printf "Partida terminada, ganó el jugador: ~a" jugador-actual)
       )
   )
