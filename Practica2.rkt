@@ -6,17 +6,25 @@
 (define shoot-again true)
 (define slots-shooted null)
 (define alfa 10000000)
-(define ops '((:primera-casilla 7)
-                      (:segunda-casilla 8)
-                      (:tercera-casilla 9)
-                      (:cuarta-casilla 10)
-                      (:quinta-casilla 11)
-                      (:sexta-casilla 12)))
+(define ops '((:primera-casilla 0)
+              (:segunda-casilla 1)
+              (:tercera-casilla 2)
+              (:cuarta-casilla 3)
+              (:quinta-casilla 4)
+              (:sexta-casilla 5)
+              (:septima-casilla 7)
+              (:octaba-casilla 8)
+              (:novena-casilla 9)
+              (:decima-casilla 10)
+              (:undecima-casilla 11)
+              (:duodecima-casilla 12)
+              ))
 (define end-game null)
 (define winner-player null)
 (define IA1-points 0) 
 (define IA2-points 0)
-(define turno 1)
+(define jugador-actual 0)
+(define depuracion #f)
 
 ; Función que imprime el tablero del mancala, en cada casilla imprime el valor de la suma de las canicas que se encuentran en esa casilla
 (define (print-board)
@@ -86,27 +94,50 @@
 ; Predicado que valida si es el operador seleccionado es valido
 (define (valid-operator? operador estado)
   (let ((operador (car(cdr operador))))
-    (cond ((= operador 7) (if (equal? null (list-ref estado 7))
-                              #f
-                              #t))
-          ((= operador 8) (if (equal? null (list-ref estado 8))
-                              #f
-                              #t))
-          ((= operador 9) (if (equal? null (list-ref estado 9))
-                              #f
-                              #t))
-          ((= operador 10) (if (equal? null (list-ref estado 10))
-                               #f
-                               #t))
-          ((= operador 11) (if (equal? null (list-ref estado 11))
-                               #f
-                               #t))
-          ((= operador 12) (if (equal? null (list-ref estado 12))
-                               #f
-                               #t))
-          (#t
-           #f)
-          )
+    (if (equal? jugador-actual 0)
+        (cond ((= operador 0) (if (equal? null (list-ref estado 0))
+                                  #f
+                                  #t))
+              ((= operador 1) (if (equal? null (list-ref estado 1))
+                                  #f
+                                  #t))
+              ((= operador 2) (if (equal? null (list-ref estado 2))
+                                  #f
+                                  #t))
+              ((= operador 3) (if (equal? null (list-ref estado 3))
+                                   #f
+                                   #t))
+              ((= operador 4) (if (equal? null (list-ref estado 4))
+                                   #f
+                                   #t))
+              ((= operador 5) (if (equal? null (list-ref estado 5))
+                                   #f
+                                   #t))
+              (#t
+               #f)
+              )
+        (cond ((= operador 7) (if (equal? null (list-ref estado 7))
+                                  #f
+                                  #t))
+              ((= operador 8) (if (equal? null (list-ref estado 8))
+                                  #f
+                                  #t))
+              ((= operador 9) (if (equal? null (list-ref estado 9))
+                                  #f
+                                  #t))
+              ((= operador 10) (if (equal? null (list-ref estado 10))
+                                   #f
+                                   #t))
+              ((= operador 11) (if (equal? null (list-ref estado 11))
+                                   #f
+                                   #t))
+              ((= operador 12) (if (equal? null (list-ref estado 12))
+                                   #f
+                                   #t))
+              (#t
+               #f)
+              )
+        )
     )
   )
 
@@ -117,14 +148,26 @@
   (define-values (ops canicas-casilla estado-resultado)
     (values (car operador)  (get-balls casilla-actual) null))
   ;(printf "~a~%" ops)
-  (case ops
-      [(:primera-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-      [(:segunda-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-      [(:tercera-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-      [(:cuarta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-      [(:quinta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-      [(:sexta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-      [else (printf "error")])
+  (if (equal? jugador-actual 0)
+      (case ops
+        [(:primera-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+        [(:segunda-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+        [(:tercera-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+        [(:cuarta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+        [(:quinta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+        [(:sexta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+        [else (printf "error")]
+        )
+     (case ops
+       [(:septima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+       [(:octaba-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+       [(:novena-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+       [(:decima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+       [(:undecima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+       [(:duodecima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+       [else (printf "error")]
+       )
+     )
   estado-resultado
   )
 
@@ -176,14 +219,36 @@
   (list estado-copia shoot-again casilla-actual)
  )
 
+;random function
+(define (juega-random debug)
+  (define posibilidades (expand board))
+  (define rng (random (length posibilidades)))
+  (when (equal? debug #t)
+    (info-depuracion (list-ref (list-ref posibilidades rng) 2))
+    )
+  
+  ;(printf "~a" (car (list-ref posibilidades rng)))
+  (set! board (car (list-ref posibilidades rng)))
+  (print-board)
+  )
+
+(define (info-depuracion movimiento)
+  (printf "Es el turno del jugador ~a.~%" jugador-actual)
+  (printf "-----------------------------~%")
+  (print-board)
+  (printf "-----------------------------~%")
+  (printf "Jugador ~a: elijo el movimiento: ~a~%" jugador-actual movimiento)
+  (printf "#############################")
+  )
+
 ;heuristic-function
 
 ; Funcion la cual cambia de jugador, si es 0 --> 1 (le toca a la IA1) y si es 1 --> 0 (le toca al IA2)
-(define (change-player jugador)
-  (case jugador
-    [(0) 1]
-    [(1) 0]
-    )
+(define (change-player)
+  (if (equal? jugador-actual 0)
+      (set! jugador-actual 1)
+      (set! jugador-actual 0)
+      )
   )
     
 ;Funcion auxiliar para expand
@@ -210,7 +275,14 @@
   sucesores
   )
 
-
+;play randomvsrandom
+(define (play-random debug)
+  (if (equal? game-ended? #f)
+      ((juega-random debug)
+       (play-random debug))
+      (printf "Partida terminada, ganó el jugador: ~a" jugador-actual)
+      )
+  )
 
 
 ;miniMax
