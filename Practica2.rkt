@@ -2,7 +2,7 @@
 
 ; Declaración de variables globales
 
-(define board '((1 5 10)(1 5 10)(1 5 10)(1 5 10)(1 5 10)(1 5 10)()(1 5 10)(1 5 10)(1 5 10)(1 5 10)(1 5 10)(1 5 10)()))
+(define board '((1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) () (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) ()))
 (define shoot-again true)
 (define slots-shooted null)
 (define alfa 10000000)
@@ -16,6 +16,7 @@
 (define winner-player null)
 (define IA1-points 0) 
 (define IA2-points 0)
+(define turno 1)
 
 ; Función que imprime el tablero del mancala, en cada casilla imprime el valor de la suma de las canicas que se encuentran en esa casilla
 (define (print-board)
@@ -26,7 +27,23 @@
 
 ; Funcion que reinicia el tablero a su estado original
 (define (reset-game)
-  (set! board '((1 5 10)(1 5 10)(1 5 10)(1 5 10)(1 5 10)(1 5 10)()(1 5 10)(1 5 10)(1 5 10)(1 5 10)(1 5 10)(1 5 10)())))
+  (set! board '((1 1 1 1 1)
+                (1 1 1 1 1)
+                (1 1 1 1 1)
+                (1 1 1 1 1)
+                (1 1 1 1 1)
+                (1 1 1 1 1)
+                ()
+                (1 1 1 1 1)
+                (1 1 1 1 1)
+                (1 1 1 1 1)
+                (1 1 1 1 1)
+                (1 1 1 1 1)
+                (1 1 1 1 1)
+                ()
+                )
+        )
+  )
 
 ;Predicado el cual valida si el juego ya terminó comprobando si alguna hilera esta completamente vacía
 (define (game-ended?)
@@ -99,16 +116,16 @@
   (define casilla-actual (car(cdr operador)))
   (define-values (ops canicas-casilla estado-resultado)
     (values (car operador)  (get-balls casilla-actual) null))
-  (printf "~a" ops)
-    (case 'ops
-      [(primera-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-      [(segunda-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-      [(tercera-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-      [(cuarta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-      [(quinta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-      [(sexta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-      [else true "Error"])
-    estado-resultado
+  ;(printf "~a~%" ops)
+  (case ops
+      [(:primera-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+      [(:segunda-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+      [(:tercera-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+      [(:cuarta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+      [(:quinta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+      [(:sexta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+      [else (printf "error")])
+  estado-resultado
   )
 
 ; Funcion que crea una copia del tablero (por motivos de seguridad)
@@ -121,7 +138,7 @@
 ;función que mueve las canicas de la IA
 (define (move-machine-balls tablero casilla-actual canicas-casilla)
   (define-values (canica-a-meter cont estado canicas longitud-canicas estado-copia best-canca shoot-again casilla-target)
-    (values null 0 null null 0 null 0 null (+ 1 casilla-actual)))
+    (values null 0 null null 0 null 0 #f (+ 1 casilla-actual)))
   (set! estado-copia (copy-board tablero))
   (for ([can canicas-casilla])
     (set! canicas (cons can canicas))
@@ -132,22 +149,22 @@
   (when (>= (length canicas) (- 13 casilla-actual))
     (begin
       (set! best-canca (car canicas))
-      (set! best-canca (list-set best-canca 13 (append estado-copia (list-ref best-canca 13))))
+      (set! best-canca (list-set estado-copia 13 (append estado-copia (list-ref estado-copia 13))))
       )
     )
   ;Si la longitud de tus canicas es igual a la canica en la que te encuentras, la IA vuelve a tirar
   (when (= 0 (- (length canicas) (- 13 casilla-actual)))
       (set! shoot-again #t)
-      (set! shoot-again null))
+      (set! shoot-again #f))
   
   (for ([canica canicas])
     (set! canica-a-meter (car (list-ref estado-copia casilla-actual)))
 
-    (if (and (= cont 0 ) ( = best-canca canica-a-meter))
+    (if (and (equal? cont 0 ) (equal? best-canca canica-a-meter))
         (begin
          (set! cont (+ 1 cont)))
         (begin
-          (when (> casilla-target 12)
+          (when (> casilla-target 13)
            (set! casilla-target 0))
           
          (set! estado-copia (list-set estado-copia casilla-target (append (list canica-a-meter) (list-ref estado-copia casilla-target))))
@@ -155,15 +172,19 @@
          )
         )
    )
+  (set! estado-copia (list-set estado-copia casilla-actual '()))
   (list estado-copia shoot-again casilla-actual)
  )
+
 ;heuristic-function
 
 ; Funcion la cual cambia de jugador, si es 0 --> 1 (le toca a la IA1) y si es 1 --> 0 (le toca al IA2)
 (define (change-player jugador)
   (case jugador
     [(0) 1]
-    [(1) 0]))
+    [(1) 0]
+    )
+  )
     
 ;Funcion auxiliar para expand
 (define (full-copy list)
@@ -181,13 +202,15 @@
     (when (valid-operator? operador estado-copia)
       (begin
         (set! nuevo-estado (apply-operator operador estado-copia))
-        (printf "~a" operador)
-        (cons nuevo-estado sucesores)
+        ;(printf "~a " nuevo-estado)
+        (set! sucesores (append sucesores (list nuevo-estado)))
         )
       )
     )
   sucesores
   )
+
+
 
 
 ;miniMax
