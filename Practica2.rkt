@@ -270,6 +270,13 @@
   (list estado-copia shoot-again casilla-actual)
   )
 
+(module+ test (begin (reset-game)
+                     (check-equal? '(((1 1 1 1 1) (1 1 1 1 1) () (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1) (1 1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) ()) #f 2)
+                                   (move-machine-balls board 2 (list-ref board 0))
+                                   )                                   
+                )
+  )
+
 ;random function
 (define (juega-random debug jugador)
   (define posibilidades (expand board jugador))
@@ -313,6 +320,19 @@
                          ))
   (+ dif-casas dif-casillas)
   )
+
+(module+ test (begin (reset-game)
+                    (check-equal? 0 (heuristica-simple board))
+                     )
+  )
+
+(module+ test (check-equal? 4 (heuristica-simple
+                               '(() (1) (1) (1) (1) () (1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                                    () () () () () () (1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1))
+                               )
+                            )
+  )
+
 
 ;clase que encuentra el mejor movimiento mediante minmax
 (define (min-max estado-tablero profundidad jugador)
@@ -364,6 +384,15 @@
         )
       )
   )
+
+(module+ test (begin (reset-game)
+                     (check-equal? (min-max board 2 0)
+                                   '((() (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) ()
+                                         (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) ()) #f 0)
+                                   )
+                     )
+  )
+
 
 (define (aplicar-min-max profundidad-max debug jugador-act)
   (define movimiento (min-max board profundidad-max jugador-act))
@@ -427,6 +456,14 @@
             )
         )
       )
+  )
+
+(module+ test (begin (reset-game)
+                     (chech-equal? '((() (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) ()
+                                         (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) ()) #f 0)
+                                   (alfa-beta board -1000 1000 2 0)
+                                   )
+                     )
   )
 
 (define (aplicar-alfa-beta profundidad-max alfa beta debug jugador-act)
