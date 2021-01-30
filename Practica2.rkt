@@ -7,7 +7,6 @@
 (define board '((1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) () (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) ()))
 (define shoot-again true)
 (define slots-shooted null)
-(define alfa 10000000)
 (define ops '((:primera-casilla 0)
               (:segunda-casilla 1)
               (:tercera-casilla 2)
@@ -27,7 +26,7 @@
 (define IA2-points 0)
 (define depuracion #f)
 
-; Función que imprime el tablero del mancala, en cada casilla imprime el valor de la suma de las canicas que se encuentran en esa casilla
+; Función que imprime el tablero del mancala, en cada casilla imprime el valor de la suma de las semillas que se encuentran en esa casilla
 (define (print-board)
   (printf   "~% ~% | ~A |  | ~A |  | ~A |  | ~A |  | ~A |  | ~A |  | ~A | ~%"
             (apply + (list-ref board 13))(apply + (list-ref board 12)) (apply + (list-ref board 11)) (apply + (list-ref board 10)) (apply + (list-ref board 9 )) (apply + (list-ref board 8)) (apply + (list-ref board 7)))
@@ -97,19 +96,19 @@
                      )
   )
 
-; Funcion que obtiene las canicas en una casilla
+; Funcion que obtiene las semillas en una casilla
 (define (get-balls casilla)
   (list-ref board casilla))
 
 (module+ test (begin (reset-game)
                      (check-equal? 5 (apply + (get-balls 3)))
-                )
- )
+                     )
+  )
 
 (module+ test (begin (reset-game)
                      (check-equal? 0 (apply + (get-balls 13)))
-                )
- )
+                     )
+  )
 
 ; Predicado que valida si es el operador seleccionado es valido
 (define (valid-operator? operador estado jugador-actual)
@@ -163,37 +162,37 @@
 
 (module+ test (begin (reset-game)
                      (check-equal? #t (valid-operator? (list-ref ops 1) board 0))
-                )
- )
+                     )
+  )
 
 (module+ test (begin (reset-game)
                      (check-equal? #t (valid-operator? (list-ref ops 7) board 1))
-                )
- )
+                     )
+  )
 
 ; Funcion que aplica un operador de *ops* a un estado determinado
 (define (apply-operator operador estado jugador-actual)
   (define casilla-actual (car(cdr operador)))
-  (define-values (ops canicas-casilla estado-resultado)
+  (define-values (ops semillas-casilla estado-resultado)
     (values (car operador)  (get-balls casilla-actual) null))
   ;(printf "~a~%" ops)
   (if (equal? jugador-actual 0)
       (case ops
-        [(:primera-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-        [(:segunda-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-        [(:tercera-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-        [(:cuarta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-        [(:quinta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-        [(:sexta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+        [(:primera-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual semillas-casilla))]
+        [(:segunda-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual semillas-casilla))]
+        [(:tercera-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual semillas-casilla))]
+        [(:cuarta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual semillas-casilla))]
+        [(:quinta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual semillas-casilla))]
+        [(:sexta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual semillas-casilla))]
         [else (printf "error")]
         )
       (case ops
-        [(:septima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-        [(:octaba-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-        [(:novena-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-        [(:decima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-        [(:undecima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-        [(:duodecima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+        [(:septima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual semillas-casilla))]
+        [(:octaba-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual semillas-casilla))]
+        [(:novena-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual semillas-casilla))]
+        [(:decima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual semillas-casilla))]
+        [(:undecima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual semillas-casilla))]
+        [(:duodecima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual semillas-casilla))]
         [else (printf "error")]
         )
       )
@@ -207,38 +206,38 @@
       (set! estado-copia (cons elemento estado-copia)))
     (reverse estado-copia)))
   
-;función que mueve las canicas de la IA
-(define (move-machine-balls tablero casilla-actual canicas-casilla)
-  (define-values (canica-a-meter cont estado canicas longitud-canicas estado-copia best-canca shoot-again casilla-target)
+;función que mueve las semillas de la IA
+(define (move-machine-balls tablero casilla-actual semillas-casilla)
+  (define-values (semilla-a-meter cont estado semillas longitud-semillas estado-copia best-canca shoot-again casilla-target)
     (values null 0 null null 0 null 0 #f (+ 1 casilla-actual)))
   (set! estado-copia (copy-board tablero))
-  (for ([can canicas-casilla])
-    (set! canicas (cons can canicas))
+  (for ([can semillas-casilla])
+    (set! semillas (cons can semillas))
     )
-  (set! canicas (sort canicas >))
-  (set! longitud-canicas (length canicas))
+  (set! semillas (sort semillas >))
+  (set! longitud-semillas (length semillas))
   
-  (when (>= (length canicas) (- 13 casilla-actual))
+  (when (>= (length semillas) (- 13 casilla-actual))
     (begin
-      (set! best-canca (car canicas))
+      (set! best-canca (car semillas))
       (set! best-canca (list-set estado-copia 13 (append estado-copia (list-ref estado-copia 13))))
       )
     )
-  ;Si la longitud de tus canicas es igual a la canica en la que te encuentras, la IA vuelve a tirar
-  (when (= 0 (- (length canicas) (- 13 casilla-actual)))
+  ;Si la longitud de tus semillas es igual a la semilla en la que te encuentras, la IA vuelve a tirar
+  (when (= 0 (- (length semillas) (- 13 casilla-actual)))
     (set! shoot-again #t)
     (set! shoot-again #f))
   
-  (for ([canica canicas])
-    (set! canica-a-meter (car (list-ref estado-copia casilla-actual)))
+  (for ([semilla semillas])
+    (set! semilla-a-meter (car (list-ref estado-copia casilla-actual)))
 
-    (if (and (equal? cont 0 ) (equal? best-canca canica-a-meter))
+    (if (and (equal? cont 0 ) (equal? best-canca semilla-a-meter))
         (set! cont (+ 1 cont))
         (begin
           (when (> casilla-target 13)
             (set! casilla-target 0))
           
-          (set! estado-copia (list-set estado-copia casilla-target (append (list canica-a-meter) (list-ref estado-copia casilla-target))))
+          (set! estado-copia (list-set estado-copia casilla-target (append (list semilla-a-meter) (list-ref estado-copia casilla-target))))
           (set! casilla-target (+ 1 casilla-target)) 
           )
         )
