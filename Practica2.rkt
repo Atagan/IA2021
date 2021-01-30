@@ -1,5 +1,7 @@
 #lang racket
 
+(module+ test (require rackunit))
+
 ; Declaración de variables globales
 
 (define board '((1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) () (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) ()))
@@ -51,7 +53,24 @@
                 )
         )
   )
-
+(module+ test (begin (reset-game)
+                     (check-equal?
+                      '((1 1 1 1 1)
+                        (1 1 1 1 1)
+                        (1 1 1 1 1)
+                        (1 1 1 1 1)
+                        (1 1 1 1 1)
+                        (1 1 1 1 1)
+                        ()
+                        (1 1 1 1 1)
+                        (1 1 1 1 1)
+                        (1 1 1 1 1)
+                        (1 1 1 1 1)
+                        (1 1 1 1 1)
+                        (1 1 1 1 1)
+                        ())
+                      board))
+  )
 ;Predicado el cual valida si el juego ya terminó comprobando si alguna hilera esta completamente vacía
 (define (game-ended?)
   (or (and
@@ -73,22 +92,24 @@
       )
   )
 
+(module+ test (begin (reset-game)
+                     (check-equal? #f (game-ended?))
+                     )
+  )
+
 ; Funcion que obtiene las canicas en una casilla
 (define (get-balls casilla)
   (list-ref board casilla))
 
-; Funcion que inserta las canicas de la forma (canica canica canica ...) en las casillas aledañas
-(define (insert-ball lista casilla)
-  (define casilla-siguiente (+ 1 casilla))
-  (for ([x lista])
-    (set! board (list-set board casilla-siguiente (append (list x) (list-ref board casilla-siguiente))))
-    (set! slots-shooted (list-set slots-shooted casilla-siguiente (append (list x) slots-shooted)))
-    (set! casilla-siguiente (+ 1 casilla-siguiente))
-    (when (> casilla-siguiente 13)
-      (set! casilla-siguiente 0)
-      )
-    )
-  )
+(module+ test (begin (reset-game)
+                     (check-equal? 5 (apply + (get-balls 3)))
+                )
+ )
+
+(module+ test (begin (reset-game)
+                     (check-equal? 0 (apply + (get-balls 13)))
+                )
+ )
 
 ; Predicado que valida si es el operador seleccionado es valido
 (define (valid-operator? operador estado jugador-actual)
@@ -140,6 +161,15 @@
     )
   )
 
+(module+ test (begin (reset-game)
+                     (check-equal? #t (valid-operator? (list-ref ops 1) board 0))
+                )
+ )
+
+(module+ test (begin (reset-game)
+                     (check-equal? #t (valid-operator? (list-ref ops 1) board 1))
+                )
+ )
 
 ; Funcion que aplica un operador de *ops* a un estado determinado
 (define (apply-operator operador estado jugador-actual)
@@ -376,6 +406,14 @@
       )
   )
 
+(define (aplicar-alfa-beta profundidad-max alfa beta debug jugador-act)
+  (define movimiento (alfa-beta board alfa beta profundidad-max jugador-act))
+  (set! board (car movimiento))
+  (when (equal? #t debug)
+    (info-depuracion (list-ref movimiento 2) jugador-act)
+    )
+  
+  )
 
 (define (change-player player)
   (if (equal? player 1)
@@ -413,7 +451,7 @@
   (if (equal? (game-ended?) #f)
       (begin
         (juega-random debug jugador1)
-        (play-random #t (change-player jugador1))
+        (play-random debug (change-player jugador1))
         )
       (begin
         (printf "Partida terminada, ganó el jugador: ~a~%" jugador1)
@@ -429,6 +467,22 @@
       (begin
         (aplicar-min-max profundidad-max debug jugador1)
         (play-min-max debug profundidad-max (change-player jugador1))
+        )
+      (begin
+        (printf "Partida terminada, ganó el jugador: ~a~%" jugador1)
+        (printf "Estado final del tablero:~%")
+        (print-board)
+        )
+      )
+  )
+
+
+;
+(define (play-alfa-beta debug profundidad-max alfa beta jugador1)
+  (if (equal? (game-ended?) #f)
+      (begin
+        (aplicar-alfa-beta profundidad-max alfa beta debug jugador1)
+        (play-alfa-beta debug profundidad-max alfa beta (change-player jugador1))
         )
       (begin
         (printf "Partida terminada, ganó el jugador: ~a~%" jugador1)
