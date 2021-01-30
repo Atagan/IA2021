@@ -631,6 +631,20 @@
     )
   )
 
+(define (tiempoEjecucionMinMax )
+  (define tiempoMinMax 0)
+  (set! tiempoMinMax (current-milliseconds))
+  (play-min-max #f 4 1 1)
+  (set! tiempoMinMax (- (current-milliseconds) tiempoMinMax))
+  (printf "Tiempo de ejecución de min-max:~a~% " tiempoMinMax))
+
+(define (tiempoEjecucionAlfaBeta )
+  (define tiempoAlfaBeta 0)
+  (set! tiempoAlfaBeta (current-milliseconds))
+  (play-alfa-beta #f 4 1 1 1)
+  (set! tiempoAlfaBeta (- (current-milliseconds) tiempoAlfaBeta))
+  (printf "Tiempo de ejecución de poda alfa-beta:~a~% " tiempoAlfaBeta))
+  
 (define (prueba-multi-minmax-random cantidad profundidad heuristica)
   (define jugador1 1)
   (define-values (ganadas perdidas empates) (values 0 0 0))
