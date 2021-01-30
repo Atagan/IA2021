@@ -223,13 +223,11 @@
 (define (juega-random debug)
   (define posibilidades (expand board))
   (define rng (random (length posibilidades)))
+  (set! board (car (list-ref posibilidades rng)))
   (when (equal? debug #t)
     (info-depuracion (list-ref (list-ref posibilidades rng) 2))
     )
-  
   ;(printf "~a" (car (list-ref posibilidades rng)))
-  (set! board (car (list-ref posibilidades rng)))
-  (print-board)
   )
 
 (define (info-depuracion movimiento)
@@ -238,10 +236,49 @@
   (print-board)
   (printf "-----------------------------~%")
   (printf "Jugador ~a: elijo el movimiento: ~a~%" jugador-actual movimiento)
-  (printf "#############################")
+  (printf "La heuristica de este movimiento es: ~a~%" (heuristica-simple board))
+  (printf "#############################~%")
   )
 
-;heuristic-function
+;heuristic-function. Mediante la operación (base1-base2)+(casillas1-casillas2)
+(define (heuristica-simple estado)
+  (define dif-casas (- (apply + (list-ref estado 6))
+                       (apply + (list-ref estado 13))
+                       ))
+  (define dif-casillas(- (+ (apply + (list-ref estado 0))
+                            (apply + (list-ref estado 1))
+                            (apply + (list-ref estado 2))
+                            (apply + (list-ref estado 3))
+                            (apply + (list-ref estado 4))
+                            (apply + (list-ref estado 5))
+                            )
+                         (+ (apply + (list-ref estado 7))
+                            (apply + (list-ref estado 8))
+                            (apply + (list-ref estado 9))
+                            (apply + (list-ref estado 10))
+                            (apply + (list-ref estado 11))
+                            (apply + (list-ref estado 12))
+                            )
+                         ))
+  (+ dif-casas dif-casillas)
+ )
+
+;clase que encuentra el mejor movimiento mediante minmax
+(define (min-max estado-tablero profundidad jugador)
+  (if (or (equal? profundidad 0) (equal? '() (expand estado-tablero)) )
+      (heuristica-simple estado-tablero)
+      (if (equal? jugador 0)
+          (begin
+            (define valor 100000000);esto da problemas?usar alfa global?
+            ;bucle que recorra todos los sucesores y pille el maximo
+            )
+          (begin
+            (define valor -10000000)
+            ;bucle que recorra todos los sucesores y pille el minimo
+            )
+       )
+    )
+  )
 
 ; Funcion la cual cambia de jugador, si es 0 --> 1 (le toca a la IA1) y si es 1 --> 0 (le toca al IA2)
 (define (change-player)
@@ -278,10 +315,15 @@
 ;play randomvsrandom
 (define (play-random debug)
   (if (equal? (game-ended?) #f)
-      ((juega-random debug)
-       (change-player)
-       (play-random #t))
-      (printf "Partida terminada, ganó el jugador: ~a" jugador-actual)
+      (begin
+        (juega-random debug)
+        (change-player)
+        (play-random #t))
+      (begin
+        (printf "Partida terminada, ganó el jugador: ~a~%" jugador-actual)
+        (printf "Estado final del tablero:~%")
+        (print-board)
+        )
       )
   )
 
