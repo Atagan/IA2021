@@ -243,7 +243,7 @@
   
 ;función que mueve las semillas de la IA
 (define (move-machine-balls tablero casilla-actual semillas-casilla)
-  (define-values (semilla-a-meter cont estado semillas longitud-semillas estado-copia best-canca shoot-again casilla-target)
+  (define-values (semilla-a-meter cont estado semillas longitud-semillas estado-copia best-sem shoot-again casilla-target)
     (values null 0 null null 0 null 0 #f (+ 1 casilla-actual)))
   (set! estado-copia (copy-board tablero))
   (for ([can semillas-casilla])
@@ -254,8 +254,8 @@
   
   (when (>= (length semillas) (- 13 casilla-actual))
     (begin
-      (set! best-canca (car semillas))
-      (set! best-canca (list-set estado-copia 13 (append estado-copia (list-ref estado-copia 13))))
+      (set! best-sem (car semillas))
+      (set! best-sem (list-set estado-copia 13 (append estado-copia (list-ref estado-copia 13))))
       )
     )
   ;Si la longitud de tus semillas es igual a la semilla en la que te encuentras, la IA vuelve a tirar
@@ -266,7 +266,7 @@
   (for ([semilla semillas])
     (set! semilla-a-meter (car (list-ref estado-copia casilla-actual)))
 
-    (if (and (equal? cont 0 ) (equal? best-canca semilla-a-meter))
+    (if (and (equal? cont 0 ) (equal? best-sem semilla-a-meter))
         (set! cont (+ 1 cont))
         (begin
           (when (> casilla-target 13)
@@ -548,36 +548,55 @@
 
 ;play randomvsrandom
 (define (play-random debug jugador1)
-  (if (equal? (game-ended?) #f)
+  (when (equal? (game-ended?) #f)
       (begin
         (juega-random debug jugador1)
         (play-random debug (change-player jugador1))
         )
-      (begin
-        (printf "Partida terminada, ganó el jugador: ~a~%" (ganador? board))
-        (printf "Estado final del tablero:~%")
-        (print-board)
-        (printf "La victoria ha sido por una diferencia de ~a puntos" (heuristica-simple board))
-        )
-      )
+    )
   )
 
 (define (prueba-random)
   (printf "Comienza el jugador 1, ambos con estratergia random~%")
   (printf "###########################~%")
   (play-random #t 1)
+  (printf "Partida terminada, ganó el jugador: ~a~%" (ganador? board))
+  (printf "Estado final del tablero:~%")
+  (print-board)
+  (printf "La victoria ha sido por una diferencia de ~a puntos~%" (heuristica-simple board))
   )
 
 (define (prueba-multi-random cantidad)
-  
+  (printf "Se jugarán ~a partidas con agentes aleatorios, la mitad empezando el jugador  1 y la otra mitad empezando el jugadot 2.~%" cantidad)
+  (define jugador 1)
+  (define-values (ganadas perdidas empates) (values 0 0 0))
+  (for ([i cantidad])
+    (reset-game)
+    (play-random #f jugador)
+    (if (equal? (ganador? board) 0)
+        (set! perdidas (+ 1 perdidas))
+        (if (equal? (ganador? board) 1)
+            (set! ganadas (+ 1 ganadas))
+            (set! empates (+ 1 empates))
+         )
+        )
+    )
+    (printf "Tras ~a, el jugador 1 ha ganado ~a, ha empatado ~a y ha perdido ~a" cantidad ganadas empates perdidas)
  )
 
 ;miniMax
-(define (play-min-max debug profundidad-max jugador1)
+(define (play-min-max debug profundidad-max-0 profundidad-max-1 jugador1)
   (if (equal? (game-ended?) #f)
       (begin
-        (aplicar-min-max profundidad-max debug jugador1)
-        (play-min-max debug profundidad-max (change-player jugador1))
+        (if (equal? jugador1 1)
+            (begin
+              (aplicar-min-max profundidad-max-0 debug jugador1)
+              (play-min-max debug profundidad-max-0 (change-player jugador1))
+              )
+            (begin
+              (aplicar-min-max profundidad-max-1 debug jugador1)
+              (play-min-max debug profundidad-max-1 (change-player jugador1))
+              )
         )
       (begin
         (printf "Partida terminada, ganó el jugador: ~a~%" (ganador? board))
@@ -585,6 +604,10 @@
         (print-board)
         )
       )
+  )
+
+(define (prueba-minmax jugador-bool prof-max-0 prof-max-1 heuristica-0 heuristica-1 )
+  #t
   )
 
 
