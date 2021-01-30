@@ -354,10 +354,10 @@
         (set! mejor-mov (car sucesores))
         (if (equal? jugador 0)
             (begin
+              (set! valorAct -1000000000)
               (for ([hijo sucesores])
                 ;bucle que recorra todos los sucesores y pille el maximo
                 (begin
-                  (set! valorAct -1000000000)
                   (set! cosaAux (min-max (car hijo) (- profundidad 1) (change-player jugador)))
                   (when (> valorAct (heuristica-simple (car cosaAux)))
                     (begin
@@ -371,10 +371,10 @@
               mejor-mov
               )
             (begin
+              (set! valorAct 1000000000)
               (for ([hijo sucesores])
                 ;bucle que recorra todos los sucesores y pille el minimo
                 (begin
-                  (set! valorAct 1000000000)
                   (set! cosaAux (min-max (car hijo) (- profundidad 1) (change-player jugador)))
                   (when (< valorAct (heuristica-simple (car cosaAux)))
                     (begin
@@ -423,12 +423,12 @@
         (set! mejor-mov (car sucesores))
         (if (equal? jugador 0)
             (begin
+              (set! valorAct -1000000000)              
               (for ([hijo sucesores]
                     #:break (> beta alfa))
                 ;bucle que recorra todos los sucesores y pille el maximo
                 (begin
-                  (set! valorAct -1000000000)
-                  (set! cosaAux (min-max (car hijo) (- profundidad 1) (change-player jugador)))
+                  (set! cosaAux (alfa-beta (car hijo) alfa beta (- profundidad 1) (change-player jugador)))
                   (when (> valorAct (heuristica-simple (car cosaAux)))
                     (begin
                       (set! valorAct (heuristica-simple (car cosaAux)))
@@ -442,12 +442,12 @@
               mejor-mov
               )
             (begin
+              (set! valorAct 1000000000)
               (for ([hijo sucesores]
                     #:break(> alfa beta))
                 ;bucle que recorra todos los sucesores y pille el minimo
                 (begin
-                  (set! valorAct 1000000000)
-                  (set! cosaAux (min-max (car hijo) (- profundidad 1) (change-player jugador)))
+                  (set! cosaAux (alfa-beta (car hijo) alfa beta (- profundidad 1) (change-player jugador)))
                   (when (< valorAct (heuristica-simple (car cosaAux)))
                     (begin
                       (set! valorAct (heuristica-simple (car cosaAux)))
@@ -587,11 +587,11 @@
         (if (equal? jugador1 1)
             (begin
               (aplicar-min-max profundidad-max-0 debug jugador1)
-              (play-min-max debug profundidad-max-0 (change-player jugador1))
+              (play-min-max debug profundidad-max-0 profundidad-max-1(change-player jugador1))
               )
             (begin
               (aplicar-min-max profundidad-max-1 debug jugador1)
-              (play-min-max debug profundidad-max-1 (change-player jugador1))
+              (play-min-max debug profundidad-max-0 profundidad-max-1 (change-player jugador1))
               )
             )
         )
