@@ -98,6 +98,17 @@
                      )
   )
 
+(define (ganador? estado)
+  (if (positive? (heuristica-simple estado))
+      1
+      (begin
+        (if (negative? (heuristica-simple estado))
+            0
+            "ninguno, ha sido empate")
+        )
+      )
+  )
+
 ; Funcion que obtiene las semillas en una casilla
 (define (get-balls casilla)
   (list-ref board casilla))
@@ -459,7 +470,7 @@
   )
 
 (module+ test (begin (reset-game)
-                     (chech-equal? '((() (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) ()
+                     (check-equal? '((() (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) ()
                                          (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) ()) #f 0)
                                    (alfa-beta board -1000 1000 2 0)
                                    )
@@ -543,12 +554,23 @@
         (play-random debug (change-player jugador1))
         )
       (begin
-        (printf "Partida terminada, ganó el jugador: ~a~%" jugador1)
+        (printf "Partida terminada, ganó el jugador: ~a~%" (ganador? board))
         (printf "Estado final del tablero:~%")
         (print-board)
+        (printf "La victoria ha sido por una diferencia de ~a puntos" (heuristica-simple board))
         )
       )
   )
+
+(define (prueba-random)
+  (printf "Comienza el jugador 1, ambos con estratergia random~%")
+  (printf "###########################~%")
+  (play-random #t 1)
+  )
+
+(define (prueba-multi-random cantidad)
+  
+ )
 
 ;miniMax
 (define (play-min-max debug profundidad-max jugador1)
@@ -558,7 +580,7 @@
         (play-min-max debug profundidad-max (change-player jugador1))
         )
       (begin
-        (printf "Partida terminada, ganó el jugador: ~a~%" jugador1)
+        (printf "Partida terminada, ganó el jugador: ~a~%" (ganador? board))
         (printf "Estado final del tablero:~%")
         (print-board)
         )
@@ -574,7 +596,7 @@
         (play-alfa-beta debug profundidad-max alfa beta (change-player jugador1))
         )
       (begin
-        (printf "Partida terminada, ganó el jugador: ~a~%" jugador1)
+        (printf "Partida terminada, ganó el jugador: ~a~%" (ganador? board))
         (printf "Estado final del tablero:~%")
         (print-board)
         )
