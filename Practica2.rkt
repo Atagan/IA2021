@@ -28,11 +28,13 @@
 
 ; Función que imprime el tablero del mancala, en cada casilla imprime el valor de la suma de las semillas que se encuentran en esa casilla
 (define (print-board)
-  (printf   "~% ~% | ~A |  | ~A |  | ~A |  | ~A |  | ~A |  | ~A |  | ~A | ~%"
-            (apply + (list-ref board 13))(apply + (list-ref board 12)) (apply + (list-ref board 11)) (apply + (list-ref board 10)) (apply + (list-ref board 9 )) (apply + (list-ref board 8)) (apply + (list-ref board 7)))
-  (printf   "~% | ~A |  | ~A |  | ~A |  | ~A |  | ~A |  | ~A |  | ~A | ~%~%"
-            (apply + (list-ref board 0)) (apply + (list-ref board 1)) (apply + (list-ref board 2)) (apply + (list-ref board 3)) (apply + (list-ref board 4)) (apply + (list-ref board 5)) (apply + (list-ref board 6))))
-
+  (printf   "~% ~%       | ~A |  | ~A |  | ~A |  | ~A |  | ~A |  | ~A | ~%"
+            (apply + (list-ref board 12)) (apply + (list-ref board 11)) (apply + (list-ref board 10)) (apply + (list-ref board 9 )) (apply + (list-ref board 8)) (apply + (list-ref board 7)))
+  (printf "~% | ~A |                                          | ~A | ~%"
+          (apply + (list-ref board 13)) (apply + (list-ref board 6)))
+  (printf   "~%       | ~A |  | ~A |  | ~A |  | ~A |  | ~A |  | ~A | ~%~%"
+            (apply + (list-ref board 0)) (apply + (list-ref board 1)) (apply + (list-ref board 2)) (apply + (list-ref board 3)) (apply + (list-ref board 4)) (apply + (list-ref board 5))))
+         
 ; Funcion que reinicia el tablero a su estado original
 (define (reset-game)
   (set! board '((1 1 1 1 1)
