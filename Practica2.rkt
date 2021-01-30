@@ -4,9 +4,9 @@
 
 ; Declaración de variables globales
 
-(define board '((1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) () (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) ()))
+(define board '((1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) ()
+                            (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) ()))
 (define shoot-again true)
-(define slots-shooted null)
 (define ops '((:primera-casilla 0)
               (:segunda-casilla 1)
               (:tercera-casilla 2)
@@ -20,10 +20,6 @@
               (:undecima-casilla 11)
               (:duodecima-casilla 12)
               ))
-(define end-game null)
-(define winner-player null)
-(define IA1-points 0) 
-(define IA2-points 0)
 (define depuracion #f)
 
 ; Función que imprime el tablero del mancala, en cada casilla imprime el valor de la suma de las semillas que se encuentran en esa casilla
