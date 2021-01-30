@@ -597,6 +597,7 @@
               (aplicar-min-max profundidad-max-1 debug jugador1)
               (play-min-max debug profundidad-max-1 (change-player jugador1))
               )
+            )
         )
       (begin
         (printf "Partida terminada, ganó el jugador: ~a~%" (ganador? board))
@@ -606,8 +607,13 @@
       )
   )
 
-(define (prueba-minmax jugador-bool prof-max-0 prof-max-1 heuristica-0 heuristica-1 )
-  #t
+(define (prueba-minmax jugador-bool prof-max-0 prof-max-1 heuristica-0 heuristica-1 debug)
+  (define jugador 2)
+  (if (equal? #t jugador-bool)
+      (set! jugador 1)
+      (set! jugador 0)
+      )
+  (play-min-max debug prof-max-0 prof-max-1 jugador)
   )
 
 
