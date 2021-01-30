@@ -322,6 +322,61 @@
   )
 
 
+(define (alfa-beta estado-tablero alfa beta profundidad jugador)
+  (define valorAct 0)
+  (define cosaAux null)
+  (define sucesores (expand estado-tablero jugador))
+  (define mejor-mov null)
+  ;(printf "~a~%" profundidad)
+  (if (or (equal? profundidad 0) (equal? '() sucesores))
+      (list estado-tablero 0 0)
+      (begin
+        (set! mejor-mov (car sucesores))
+        (if (equal? jugador 0)
+            (begin
+              (for ([hijo sucesores]
+                    #:break (> beta alfa))
+                ;bucle que recorra todos los sucesores y pille el maximo
+                (begin
+                  (set! valorAct -1000000000)
+                  (set! cosaAux (min-max (car hijo) (- profundidad 1) (change-player jugador)))
+                  (when (> valorAct (heuristica-simple (car cosaAux)))
+                    (begin
+                      (set! valorAct (heuristica-simple (car cosaAux)))
+                      (set! alfa valorAct)
+                      (set! mejor-mov cosaAux)
+                      )
+                    )
+                  )
+                )
+              ;(printf "mejor-mov: ~a~%" mejor-mov)
+              mejor-mov
+              )
+            (begin
+              (for ([hijo sucesores]
+                    #:break(> alfa beta))
+                ;bucle que recorra todos los sucesores y pille el minimo
+                (begin
+                  (set! valorAct 1000000000)
+                  (set! cosaAux (min-max (car hijo) (- profundidad 1) (change-player jugador)))
+                  (when (< valorAct (heuristica-simple (car cosaAux)))
+                    (begin
+                      (set! valorAct (heuristica-simple (car cosaAux)))
+                      (set! beta valorAct)
+                      (set! mejor-mov cosaAux)
+                      )
+                    )
+                  )
+                )
+              ;(printf "mejor-mov: ~a~%" mejor-mov)
+              mejor-mov
+              )
+            )
+        )
+      )
+  )
+
+
 (define (change-player player)
   (if (equal? player 1)
       0
