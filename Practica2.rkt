@@ -23,15 +23,14 @@
 (define winner-player null)
 (define IA1-points 0) 
 (define IA2-points 0)
-(define jugador-actual 0)
 (define depuracion #f)
 
 ; Función que imprime el tablero del mancala, en cada casilla imprime el valor de la suma de las canicas que se encuentran en esa casilla
 (define (print-board)
   (printf   "~% ~% | ~A |  | ~A |  | ~A |  | ~A |  | ~A |  | ~A |  | ~A | ~%"
-           (apply + (list-ref board 13))(apply + (list-ref board 12)) (apply + (list-ref board 11)) (apply + (list-ref board 10)) (apply + (list-ref board 9 )) (apply + (list-ref board 8)) (apply + (list-ref board 7)))
+            (apply + (list-ref board 13))(apply + (list-ref board 12)) (apply + (list-ref board 11)) (apply + (list-ref board 10)) (apply + (list-ref board 9 )) (apply + (list-ref board 8)) (apply + (list-ref board 7)))
   (printf   "~% | ~A |  | ~A |  | ~A |  | ~A |  | ~A |  | ~A |  | ~A | ~%~%"
-           (apply + (list-ref board 0)) (apply + (list-ref board 1)) (apply + (list-ref board 2)) (apply + (list-ref board 3)) (apply + (list-ref board 4)) (apply + (list-ref board 5)) (apply + (list-ref board 6))))
+            (apply + (list-ref board 0)) (apply + (list-ref board 1)) (apply + (list-ref board 2)) (apply + (list-ref board 3)) (apply + (list-ref board 4)) (apply + (list-ref board 5)) (apply + (list-ref board 6))))
 
 ; Funcion que reinicia el tablero a su estado original
 (define (reset-game)
@@ -86,13 +85,13 @@
     (set! slots-shooted (list-set slots-shooted casilla-siguiente (append (list x) slots-shooted)))
     (set! casilla-siguiente (+ 1 casilla-siguiente))
     (when (> casilla-siguiente 13)
-        (set! casilla-siguiente 0)
+      (set! casilla-siguiente 0)
+      )
     )
-   )
- )
+  )
 
 ; Predicado que valida si es el operador seleccionado es valido
-(define (valid-operator? operador estado)
+(define (valid-operator? operador estado jugador-actual)
   (let ((operador (car(cdr operador))))
     (if (equal? jugador-actual 0)
         (cond ((= operador 0) (if (equal? null (list-ref estado 0))
@@ -105,14 +104,14 @@
                                   #f
                                   #t))
               ((= operador 3) (if (equal? null (list-ref estado 3))
-                                   #f
-                                   #t))
+                                  #f
+                                  #t))
               ((= operador 4) (if (equal? null (list-ref estado 4))
-                                   #f
-                                   #t))
+                                  #f
+                                  #t))
               ((= operador 5) (if (equal? null (list-ref estado 5))
-                                   #f
-                                   #t))
+                                  #f
+                                  #t))
               (#t
                #f)
               )
@@ -143,7 +142,7 @@
 
 
 ; Funcion que aplica un operador de *ops* a un estado determinado
-(define (apply-operator operador estado)
+(define (apply-operator operador estado jugador-actual)
   (define casilla-actual (car(cdr operador)))
   (define-values (ops canicas-casilla estado-resultado)
     (values (car operador)  (get-balls casilla-actual) null))
@@ -158,24 +157,24 @@
         [(:sexta-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
         [else (printf "error")]
         )
-     (case ops
-       [(:septima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-       [(:octaba-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-       [(:novena-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-       [(:decima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-       [(:undecima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-       [(:duodecima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
-       [else (printf "error")]
-       )
-     )
+      (case ops
+        [(:septima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+        [(:octaba-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+        [(:novena-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+        [(:decima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+        [(:undecima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+        [(:duodecima-casilla) (set! estado-resultado (move-machine-balls estado casilla-actual canicas-casilla))]
+        [else (printf "error")]
+        )
+      )
   estado-resultado
   )
 
 ; Funcion que crea una copia del tablero (por motivos de seguridad)
 (define (copy-board tablero)
   (let ((estado-copia null))
-  (for ([elemento tablero])
-    (set! estado-copia (cons elemento estado-copia)))
+    (for ([elemento tablero])
+      (set! estado-copia (cons elemento estado-copia)))
     (reverse estado-copia)))
   
 ;función que mueve las canicas de la IA
@@ -185,7 +184,7 @@
   (set! estado-copia (copy-board tablero))
   (for ([can canicas-casilla])
     (set! canicas (cons can canicas))
-   )
+    )
   (set! canicas (sort canicas >))
   (set! longitud-canicas (length canicas))
   
@@ -197,40 +196,39 @@
     )
   ;Si la longitud de tus canicas es igual a la canica en la que te encuentras, la IA vuelve a tirar
   (when (= 0 (- (length canicas) (- 13 casilla-actual)))
-      (set! shoot-again #t)
-      (set! shoot-again #f))
+    (set! shoot-again #t)
+    (set! shoot-again #f))
   
   (for ([canica canicas])
     (set! canica-a-meter (car (list-ref estado-copia casilla-actual)))
 
     (if (and (equal? cont 0 ) (equal? best-canca canica-a-meter))
-        (begin
-         (set! cont (+ 1 cont)))
+        (set! cont (+ 1 cont))
         (begin
           (when (> casilla-target 13)
-           (set! casilla-target 0))
+            (set! casilla-target 0))
           
-         (set! estado-copia (list-set estado-copia casilla-target (append (list canica-a-meter) (list-ref estado-copia casilla-target))))
-         (set! casilla-target (+ 1 casilla-target)) 
-         )
+          (set! estado-copia (list-set estado-copia casilla-target (append (list canica-a-meter) (list-ref estado-copia casilla-target))))
+          (set! casilla-target (+ 1 casilla-target)) 
+          )
         )
-   )
+    )
   (set! estado-copia (list-set estado-copia casilla-actual '()))
   (list estado-copia shoot-again casilla-actual)
- )
+  )
 
 ;random function
-(define (juega-random debug)
-  (define posibilidades (expand board))
+(define (juega-random debug jugador)
+  (define posibilidades (expand board jugador))
   (define rng (random (length posibilidades)))
   (set! board (car (list-ref posibilidades rng)))
   (when (equal? debug #t)
-    (info-depuracion (list-ref (list-ref posibilidades rng) 2))
+    (info-depuracion (list-ref (list-ref posibilidades rng) 2) jugador)
     )
   ;(printf "~a" (car (list-ref posibilidades rng)))
   )
 
-(define (info-depuracion movimiento)
+(define (info-depuracion movimiento jugador-actual)
   (printf "Es el turno del jugador ~a.~%" jugador-actual)
   (printf "-----------------------------~%")
   (print-board)
@@ -261,49 +259,92 @@
                             )
                          ))
   (+ dif-casas dif-casillas)
- )
+  )
 
 ;clase que encuentra el mejor movimiento mediante minmax
 (define (min-max estado-tablero profundidad jugador)
-  (if (or (equal? profundidad 0) (equal? '() (expand estado-tablero)) )
-      (heuristica-simple estado-tablero)
-      (if (equal? jugador 0)
-          (begin
-            (define valor 100000000);esto da problemas?usar alfa global?
-            ;bucle que recorra todos los sucesores y pille el maximo
+  (define valorAct 0)
+  (define cosaAux null)
+  (define sucesores (expand estado-tablero jugador))
+  (define mejor-mov null)
+  ;(printf "~a~%" profundidad)
+  (if (or (equal? profundidad 0) (equal? '() sucesores))
+      (list estado-tablero 0 0)
+      (begin
+        (set! mejor-mov (car sucesores))
+        (if (equal? jugador 0)
+            (begin
+              (for ([hijo sucesores])
+                ;bucle que recorra todos los sucesores y pille el maximo
+                (begin
+                  (set! valorAct -1000000000)
+                  (set! cosaAux (min-max (car hijo) (- profundidad 1) (change-player jugador)))
+                  (when (> valorAct (heuristica-simple (car cosaAux)))
+                    (begin
+                      (set! valorAct (heuristica-simple (car cosaAux)))
+                      (set! mejor-mov cosaAux)
+                      )
+                    )
+                  )
+                )
+              ;(printf "mejor-mov: ~a~%" mejor-mov)
+              mejor-mov
+              )
+            (begin
+              (for ([hijo sucesores])
+                ;bucle que recorra todos los sucesores y pille el minimo
+                (begin
+                  (set! valorAct 1000000000)
+                  (set! cosaAux (min-max (car hijo) (- profundidad 1) (change-player jugador)))
+                  (when (< valorAct (heuristica-simple (car cosaAux)))
+                    (begin
+                      (set! valorAct (heuristica-simple (car cosaAux)))
+                      (set! mejor-mov cosaAux)
+                      )
+                    )
+                  )
+                )
+              ;(printf "mejor-mov: ~a~%" mejor-mov)
+              mejor-mov
+              )
             )
-          (begin
-            (define valor -10000000)
-            ;bucle que recorra todos los sucesores y pille el minimo
-            )
-       )
-    )
+        )
+      )
   )
 
-; Funcion la cual cambia de jugador, si es 0 --> 1 (le toca a la IA1) y si es 1 --> 0 (le toca al IA2)
-(define (change-player)
-  (if (equal? jugador-actual 0)
-      (set! jugador-actual 1)
-      (set! jugador-actual 0)
+(define (aplicar-min-max profundidad-max debug jugador-act)
+  (define movimiento (min-max board profundidad-max jugador-act))
+  (set! board (car movimiento))
+  (when (equal? #t debug)
+    (info-depuracion (list-ref movimiento 2) jugador-act)
+    )
+  
+  )
+
+
+(define (change-player player)
+  (if (equal? player 1)
+      0
+      1
       )
   )
     
 ;Funcion auxiliar para expand
 (define (full-copy list)
-(if (null? list) 
-  '() 
-  (if (list? list) 
-      (cons (full-copy (car list)) (full-copy (cdr list)))
-      list)))
+  (if (null? list) 
+      '() 
+      (if (list? list) 
+          (cons (full-copy (car list)) (full-copy (cdr list)))
+          list)))
      
 ;Funcion que aplica todos los operadores de *ops* a un estado determinado y los regresa en una lista
-(define (expand estado)
+(define (expand estado jugador)
   (define-values (sucesores nuevo-estado estado-copia)
     (values null null (full-copy estado)))
   (for ([operador ops]) 
-    (when (valid-operator? operador estado-copia)
+    (when (valid-operator? operador estado-copia jugador)
       (begin
-        (set! nuevo-estado (apply-operator operador estado-copia))
+        (set! nuevo-estado (apply-operator operador estado-copia jugador))
         ;(printf "~a " nuevo-estado)
         (set! sucesores (append sucesores (list nuevo-estado)))
         )
@@ -313,19 +354,31 @@
   )
 
 ;play randomvsrandom
-(define (play-random debug)
+(define (play-random debug jugador1)
   (if (equal? (game-ended?) #f)
       (begin
-        (juega-random debug)
-        (change-player)
-        (play-random #t))
+        (juega-random debug jugador1)
+        (play-random #t (change-player jugador1))
+        )
       (begin
-        (printf "Partida terminada, ganó el jugador: ~a~%" jugador-actual)
+        (printf "Partida terminada, ganó el jugador: ~a~%" jugador1)
         (printf "Estado final del tablero:~%")
         (print-board)
         )
       )
   )
 
-
 ;miniMax
+(define (play-min-max debug profundidad-max jugador1)
+  (if (equal? (game-ended?) #f)
+      (begin
+        (aplicar-min-max profundidad-max debug jugador1)
+        (play-min-max debug profundidad-max (change-player jugador1))
+        )
+      (begin
+        (printf "Partida terminada, ganó el jugador: ~a~%" jugador1)
+        (printf "Estado final del tablero:~%")
+        (print-board)
+        )
+      )
+  )
