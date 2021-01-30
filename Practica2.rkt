@@ -612,6 +612,46 @@
   (play-min-max debug prof-max-0 prof-max-1 jugador)
   )
 
+(define (play-random-minmax profundidad jugador1)
+  (when (equal? (game-ended?) #f)
+      (begin
+        (if (equal? 0 jugador1)
+            (begin
+              (juega-random #f 0)
+              (aplicar-min-max profundidad #f 1)
+              (play-random-minmax profundidad jugador1)
+              )
+            (begin
+              (aplicar-min-max profundidad #f 1)
+              (juega-random #f 0)
+              (play-random-minmax profundidad jugador1)
+              )
+            )
+        )
+    )
+  )
+
+(define (prueba-multi-minmax-random cantidad profundidad heuristica)
+  (define jugador1 1)
+  (define-values (ganadas perdidas empates) (values 0 0 0))
+  (printf "Se jugarán ~a partidas," cantidad)
+  (printf "Comienza el jugador 1, con estratergia minmax y el jugador 0 con estraregia aleatoria~%")
+  (printf "###########################~%")
+  
+  (for ([i cantidad])
+    (reset-game)
+    (play-random-minmax profundidad jugador1)
+    (if (equal? (ganador? board) 0)
+        (set! perdidas (+ 1 perdidas))
+        (if (equal? (ganador? board) 1)
+            (set! ganadas (+ 1 ganadas))
+            (set! empates (+ 1 empates))
+            )
+        )
+    )
+  
+  (printf "Tras ~a, el jugador 1 ha ganado ~a, ha empatado ~a y ha perdido ~a" cantidad ganadas empates perdidas)
+  )
 
 ;
 (define (play-alfa-beta debug profundidad-max alfa beta jugador1)
