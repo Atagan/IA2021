@@ -199,12 +199,34 @@
   estado-resultado
   )
 
+(module+ test (begin (reset-game)
+                     (check-equal?
+                      '((() (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) () (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) ()) #f 0)
+                      (apply-operator (list-ref ops 0) board 0)
+                      )
+                     )
+  )
+
+(module+ test (begin (reset-game)
+                     (check-equal?
+                      '(((1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) () () (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) ()) #f 7)
+                      (apply-operator (list-ref ops 6) board 1)
+                      )
+                     )
+  )
+
+
 ; Funcion que crea una copia del tablero (por motivos de seguridad)
 (define (copy-board tablero)
   (let ((estado-copia null))
     (for ([elemento tablero])
       (set! estado-copia (cons elemento estado-copia)))
     (reverse estado-copia)))
+
+(module+ test (begin (reset-game)
+                     (check-equal? board (copy-board board))
+                     )
+  )
   
 ;función que mueve las semillas de la IA
 (define (move-machine-balls tablero casilla-actual semillas-casilla)
