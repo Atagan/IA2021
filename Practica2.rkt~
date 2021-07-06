@@ -383,7 +383,6 @@
                       (set! cosaAux (min-max (car hijo) (- profundidad 1) jugador))
                   )
                   (set! cosaAux (list-set cosaAux 1 (list-ref hijo 1)))
-                  (set! cosaAux (list-set cosaAux 2 (list-ref hijo 2)))
                   ;(printf "~a~%" cosaAux)
                   ;(printf "Mi heuristica ahora mismo vale: ~a, y el del nodo que compruebo: ~a.~%" valorAct (heuristica-simple (car cosaAux)))
                   (when (< valorAct (heuristica-simple (car cosaAux)))
@@ -407,7 +406,6 @@
                       (set! cosaAux (min-max (car hijo) (- profundidad 1) jugador))
                   )
                   (set! cosaAux (list-set cosaAux 1 (list-ref hijo 1)))
-                  (set! cosaAux (list-set cosaAux 2 (list-ref hijo 2)))
                   (when (> valorAct (heuristica-simple (car cosaAux)))
                     (begin
                       (set! valorAct (heuristica-simple (car cosaAux)))
@@ -466,7 +464,6 @@
                       (set! cosaAux (min-max (car hijo) (- profundidad 1) jugador))
                   )
                   (set! cosaAux (list-set cosaAux 1 (list-ref hijo 1)))
-                  (set! cosaAux (list-set cosaAux 2 (list-ref hijo 2)))
                   (when (< valorAct (heuristica-simple (car cosaAux)))
                     (begin
                       (set! valorAct (heuristica-simple (car cosaAux)))
@@ -490,7 +487,6 @@
                       (set! cosaAux (min-max (car hijo) (- profundidad 1) jugador))
                   )
                   (set! cosaAux (list-set cosaAux 1 (list-ref hijo 1)))
-                  (set! cosaAux (list-set cosaAux 2 (list-ref hijo 2)))
                   (when (> valorAct (heuristica-simple (car cosaAux)))
                     (begin
                       (set! valorAct (heuristica-simple (car cosaAux)))
