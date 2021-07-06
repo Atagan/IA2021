@@ -255,10 +255,10 @@
       )
     )
   ;Si la longitud de tus semillas es igual a la semilla en la que te encuentras, la IA vuelve a tirar
-  (when (= 0 (- (length semillas) (- 13 casilla-actual)))
+  (if (= 0 (- (length semillas) (- 13 casilla-actual)))
     (set! shoot-again #t)
-    (set! shoot-again #f))
-  
+    (set! shoot-again #f)
+    )
   (for ([semilla semillas])
     (set! semilla-a-meter (car (list-ref estado-copia casilla-actual)))
 
@@ -273,7 +273,25 @@
           )
         )
     )
+
   (set! estado-copia (list-set estado-copia casilla-actual '()))
+  ;aquí va el robo
+
+  ;robo de jugador 0 a 1
+  (when (and (>= casilla-actual 0) (<= casilla-actual 5) (>= casilla-target 7) (<= casilla-target 12) (equal? (list-ref estado-copia casilla-target) '()))
+    (define simetrica (- 13 casilla-target))
+    (set! estado-copia (list-set estado-copia casilla-target (append (list-ref estado-copia simetrica) (list-ref estado-copia casilla-target))))
+    (set! estado-copia (list-set estado-copia casilla-target '()))
+    ;(printf "Saco de: ~a, meto en ~a~%"casilla-actual casilla-target)
+    )
+  
+  (when (and (>= casilla-actual 7) (<= casilla-actual 12) (>= casilla-target 0) (<= casilla-target 5) (equal? (list-ref estado-copia casilla-target) '()))
+    (define simetrica (- 13 casilla-target))
+    (set! estado-copia (list-set estado-copia casilla-target (append (list-ref estado-copia simetrica) (list-ref estado-copia casilla-target))))
+    (set! estado-copia (list-set estado-copia casilla-target '()))
+    ;(printf "Saco de: ~a, meto en ~a~%"casilla-actual casilla-target)
+    )
+  
   (list estado-copia shoot-again casilla-actual)
   )
 
@@ -287,12 +305,14 @@
 ;random function
 (define (juega-random debug jugador)
   (define posibilidades (expand board jugador))
+  ;(printf "tengo ~a posibilidades~%" posibilidades)
   (define rng (random (length posibilidades)))
   (set! board (car (list-ref posibilidades rng)))
   (when (equal? debug #t)
     (info-depuracion (list-ref (list-ref posibilidades rng) 2) jugador)
     )
   ;(printf "~a" (car (list-ref posibilidades rng)))
+  (list-ref (list-ref posibilidades rng) 1)
   )
 
 (define (info-depuracion movimiento jugador-actual)
@@ -349,7 +369,7 @@
   (define mejor-mov null)
   ;(printf "~a~%" profundidad)
   (if (or (equal? profundidad 0) (equal? '() sucesores))
-      (list estado-tablero 0 0)
+      (list estado-tablero #f 0)
       (begin
         (set! mejor-mov (car sucesores))
         (if (equal? jugador 0)
@@ -358,8 +378,14 @@
               (for ([hijo sucesores])
                 ;bucle que recorra todos los sucesores y pille el maximo
                 (begin
-                  (set! cosaAux (min-max (car hijo) (- profundidad 1) (change-player jugador)))
-                  (when (> valorAct (heuristica-simple (car cosaAux)))
+                  (if (equal? (car(cdr hijo)) #f) 
+                      (set! cosaAux (min-max (car hijo) (- profundidad 1) (change-player jugador)))
+                      (set! cosaAux (min-max (car hijo) (- profundidad 1) jugador))
+                  )
+                  (set! cosaAux (list-set cosaAux 1 (list-ref hijo 1)))
+                  ;(printf "~a~%" cosaAux)
+                  ;(printf "Mi heuristica ahora mismo vale: ~a, y el del nodo que compruebo: ~a.~%" valorAct (heuristica-simple (car cosaAux)))
+                  (when (< valorAct (heuristica-simple (car cosaAux)))
                     (begin
                       (set! valorAct (heuristica-simple (car cosaAux)))
                       (set! mejor-mov cosaAux)
@@ -375,8 +401,12 @@
               (for ([hijo sucesores])
                 ;bucle que recorra todos los sucesores y pille el minimo
                 (begin
-                  (set! cosaAux (min-max (car hijo) (- profundidad 1) (change-player jugador)))
-                  (when (< valorAct (heuristica-simple (car cosaAux)))
+                  (if (equal? (car(cdr hijo)) #f) 
+                      (set! cosaAux (min-max (car hijo) (- profundidad 1) (change-player jugador)))
+                      (set! cosaAux (min-max (car hijo) (- profundidad 1) jugador))
+                  )
+                  (set! cosaAux (list-set cosaAux 1 (list-ref hijo 1)))
+                  (when (> valorAct (heuristica-simple (car cosaAux)))
                     (begin
                       (set! valorAct (heuristica-simple (car cosaAux)))
                       (set! mejor-mov cosaAux)
@@ -394,8 +424,8 @@
 
 (module+ test (begin (reset-game)
                      (check-equal? (min-max board 2 0)
-                                   '((() (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) ()
-                                         (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) ()) #f 0)
+                                   '((() (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) () ()
+                                         (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) ()) #f 0)
                                    )
                      )
   )
@@ -407,7 +437,8 @@
   (when (equal? #t debug)
     (info-depuracion (list-ref movimiento 2) jugador-act)
     )
-  
+  ;(printf "~a~%" (list-ref movimiento 1))
+  (list-ref movimiento 1)
   )
 
 
@@ -428,8 +459,12 @@
                     #:break (> beta alfa))
                 ;bucle que recorra todos los sucesores y pille el maximo
                 (begin
-                  (set! cosaAux (alfa-beta (car hijo) alfa beta (- profundidad 1) (change-player jugador)))
-                  (when (> valorAct (heuristica-simple (car cosaAux)))
+                  (if (equal? (car(cdr hijo)) #f) 
+                      (set! cosaAux (min-max (car hijo) (- profundidad 1) (change-player jugador)))
+                      (set! cosaAux (min-max (car hijo) (- profundidad 1) jugador))
+                  )
+                  (set! cosaAux (list-set cosaAux 1 (list-ref hijo 1)))
+                  (when (< valorAct (heuristica-simple (car cosaAux)))
                     (begin
                       (set! valorAct (heuristica-simple (car cosaAux)))
                       (set! alfa valorAct)
@@ -447,8 +482,12 @@
                     #:break(> alfa beta))
                 ;bucle que recorra todos los sucesores y pille el minimo
                 (begin
-                  (set! cosaAux (alfa-beta (car hijo) alfa beta (- profundidad 1) (change-player jugador)))
-                  (when (< valorAct (heuristica-simple (car cosaAux)))
+                  (if (equal? (car(cdr hijo)) #f) 
+                      (set! cosaAux (min-max (car hijo) (- profundidad 1) (change-player jugador)))
+                      (set! cosaAux (min-max (car hijo) (- profundidad 1) jugador))
+                  )
+                  (set! cosaAux (list-set cosaAux 1 (list-ref hijo 1)))
+                  (when (> valorAct (heuristica-simple (car cosaAux)))
                     (begin
                       (set! valorAct (heuristica-simple (car cosaAux)))
                       (set! beta valorAct)
@@ -479,7 +518,7 @@
   (when (equal? #t debug)
     (info-depuracion (list-ref movimiento 2) jugador-act)
     )
-  
+  (list-ref movimiento 1)
   )
 
 (define (change-player player)
@@ -532,7 +571,7 @@
 
 (module+ test (begin (reset-game)
                      (check-equal? '((((1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) () () (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) ()) #f 7)
-                                     (((1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) () (1 1 1 1 1) () (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1)) #f 8)
+                                     (((1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) () (1 1 1 1 1) () (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1)) #t 8)
                                      (((1 1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) () (1 1 1 1 1) (1 1 1 1 1) () (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1)) #f 9)
                                      (((1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) () (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) () (1 1 1 1 1 1) (1 1 1 1 1 1) (1)) #f 10)
                                      (((1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) () (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) (1 1 1 1 1) () (1 1 1 1 1 1) (1)) #f 11)
@@ -545,10 +584,12 @@
 ;play randomvsrandom
 (define (play-random debug jugador1)
   (when (equal? (game-ended?) #f)
-      (begin
-        (juega-random debug jugador1)
-        (play-random debug (change-player jugador1))
-        )
+    (begin
+      (if(juega-random debug jugador1)
+         (play-random debug jugador1)
+         (play-random debug (change-player jugador1))
+         )
+      )
     )
   )
 
@@ -568,7 +609,7 @@
   (define-values (ganadas perdidas empates) (values 0 0 0))
   (for ([i cantidad])
     (reset-game)
-    (play-random #f jugador)
+    (play-random #f jugador)
     (if (equal? (ganador? board) 0)
         (set! perdidas (+ 1 perdidas))
         (if (equal? (ganador? board) 1)
@@ -586,12 +627,16 @@
       (begin
         (if (equal? jugador1 1)
             (begin
-              (aplicar-min-max profundidad-max-0 debug jugador1)
-              (play-min-max debug profundidad-max-0 profundidad-max-1(change-player jugador1))
+              (if(aplicar-min-max profundidad-max-0 debug jugador1)
+                 (play-min-max debug profundidad-max-0 profundidad-max-1 jugador1)
+                 (play-min-max debug profundidad-max-0 profundidad-max-1(change-player jugador1))
+                 )
               )
             (begin
-              (aplicar-min-max profundidad-max-1 debug jugador1)
-              (play-min-max debug profundidad-max-0 profundidad-max-1 (change-player jugador1))
+              (if(aplicar-min-max profundidad-max-1 debug jugador1)
+                 (play-min-max debug profundidad-max-0 profundidad-max-1 jugador1)
+                 (play-min-max debug profundidad-max-0 profundidad-max-1 (change-player jugador1))
+                 )
               )
             )
         )
@@ -599,6 +644,7 @@
         (printf "Partida terminada, ganó el jugador: ~a~%" (ganador? board))
         (printf "Estado final del tablero:~%")
         (print-board)
+        ;(reset-game)
         )
       )
   )
@@ -618,48 +664,72 @@
         (if (equal? 0 jugador1)
             (begin
               (juega-random #f 0)
-              (aplicar-min-max profundidad #f 1)
-              (play-random-minmax profundidad jugador1)
+              (play-random-minmax profundidad (change-player jugador1))
               )
             (begin
               (aplicar-min-max profundidad #f 1)
-              (juega-random #f 0)
-              (play-random-minmax profundidad jugador1)
+              (play-random-minmax profundidad (change-player jugador1))
               )
             )
         )
     )
   )
 
+(define (tiempoEjecucionMinMax)
+  (reset-game)
+  (define tiempoMinMax 0)
+  (set! tiempoMinMax (current-milliseconds))
+  (play-min-max #f 4 4 1)
+  (set! tiempoMinMax (- (current-milliseconds) tiempoMinMax))
+  (printf "Tiempo de ejecución de min-max:~a~% " tiempoMinMax))
+
+(define (tiempoEjecucionAlfaBeta)
+  (reset-game)
+  (define tiempoAlfaBeta 0)
+  (set! tiempoAlfaBeta (current-milliseconds))
+  (play-alfa-beta #f 4 4 1 1)
+  (set! tiempoAlfaBeta (- (current-milliseconds) tiempoAlfaBeta))
+  (printf "Tiempo de ejecución de poda alfa-beta:~a~% " tiempoAlfaBeta))
+  
 (define (prueba-multi-minmax-random cantidad profundidad heuristica)
   (define jugador1 1)
   (define-values (ganadas perdidas empates) (values 0 0 0))
   (printf "Se jugarán ~a partidas," cantidad)
-  (printf "Comienza el jugador 1, con estratergia minmax y el jugador 0 con estraregia aleatoria~%")
+  (printf "Comienza el jugador 0, con estratergia minmax y el jugador 1 con estrategia aleatoria~%")
   (printf "###########################~%")
-  
+  (reset-game)
   (for ([i cantidad])
     (reset-game)
     (play-random-minmax profundidad jugador1)
     (if (equal? (ganador? board) 0)
-        (set! perdidas (+ 1 perdidas))
+        (set! ganadas (+ 1 ganadas))
         (if (equal? (ganador? board) 1)
-            (set! ganadas (+ 1 ganadas))
+            (set! perdidas (+ 1 perdidas))
             (set! empates (+ 1 empates))
             )
         )
     )
   
-  (printf "Tras ~a, el jugador 1 ha ganado ~a, ha empatado ~a y ha perdido ~a" cantidad ganadas empates perdidas)
+  (printf "Tras ~a, el jugador 0 ha ganado ~a, ha empatado ~a y ha perdido ~a" cantidad ganadas empates perdidas)
   )
 
 ;
-(define (play-alfa-beta debug profundidad-max alfa beta jugador1)
+(define (play-alfa-beta debug profundidad-max-0 profundidad-max-1 alfa beta jugador1)
   (if (equal? (game-ended?) #f)
-      (begin
-        (aplicar-alfa-beta profundidad-max alfa beta debug jugador1)
-        (play-alfa-beta debug profundidad-max alfa beta (change-player jugador1))
-        )
+      (if (equal? jugador1 1)
+          (begin
+            (if(aplicar-alfa-beta profundidad-max-0 debug jugador1)
+               (play-alfa-beta debug profundidad-max-0 alfa beta jugador1)
+               (play-alfa-beta debug profundidad-max-0 alfa beta (change-player jugador1))
+               )
+            )
+          (begin
+            (if(aplicar-alfa-beta profundidad-max-1 debug jugador1)
+               (play-alfa-beta debug profundidad-max-1 alfa beta jugador1)
+               (play-alfa-beta debug profundidad-max-1 alfa beta (change-player jugador1))
+                )
+            )
+          )
       (begin
         (printf "Partida terminada, ganó el jugador: ~a~%" (ganador? board))
         (printf "Estado final del tablero:~%")
