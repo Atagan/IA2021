@@ -675,6 +675,7 @@
     )
   )
 
+<<<<<<< HEAD
 (define (tiempoEjecucionMinMax)
   (reset-game)
   (define tiempoMinMax 0)
@@ -688,6 +689,19 @@
   (define tiempoAlfaBeta 0)
   (set! tiempoAlfaBeta (current-milliseconds))
   (play-alfa-beta #f 4 4 1 1)
+=======
+(define (tiempoEjecucionMinMax )
+  (define tiempoMinMax 0)
+  (set! tiempoMinMax (current-milliseconds))
+  (play-min-max #f 4 1 1)
+  (set! tiempoMinMax (- (current-milliseconds) tiempoMinMax))
+  (printf "Tiempo de ejecución de min-max:~a~% " tiempoMinMax))
+
+(define (tiempoEjecucionAlfaBeta )
+  (define tiempoAlfaBeta 0)
+  (set! tiempoAlfaBeta (current-milliseconds))
+  (play-alfa-beta #f 4 1 1 1)
+>>>>>>> 7dfd94c212fcf316beb5a41da33dc65e325f5c00
   (set! tiempoAlfaBeta (- (current-milliseconds) tiempoAlfaBeta))
   (printf "Tiempo de ejecución de poda alfa-beta:~a~% " tiempoAlfaBeta))
   
